@@ -19,7 +19,7 @@ journeys/<name>.json  ->  wayforge build  ->  dist/<name>.html  (one self-contai
 ## Read this first
 
 1. `README.md` (goals, concepts, target schema sketch, acceptance criteria).
-2. `reference/lead-journey.html`. This is the **golden master**. Never edit it. Its rendered output is the spec. When this file and any document disagree, the file wins.
+2. `reference/lead-journey.html` in the private `wayforge-private` repo (see "Private data" below). This is the **golden master**. Never edit it. Its rendered output is the spec. When this file and any document disagree, the file wins.
 3. Do not write code until you have proposed (a) the final JSON schema and (b) the module layout, and the user has approved them.
 
 ## Architecture rules
@@ -164,11 +164,17 @@ The built file must be one self-contained HTML file, under 16 MB:
 The repo will become public. Build with that in mind from the start:
 
 - **Nothing private in the engine.** No company names, internal system names, real recipe names or customer data in `src/`, `schema/`, `themes/` or tests. Anything proprietary lives only in `journeys/`.
-- **Dataset #1 is not public-safe yet.** `journeys/lead-journey.json` describes a real process. Keep it clearly separated so it can be removed or sanitized before release. Public example journeys go in `journeys/examples/` and must be generic.
+- **Dataset #1 is not public-safe yet.** `journeys/lead-journey.json` describes a real process. It lives only in the private `wayforge-private` repo, never in this one (both paths are in `.gitignore`). Public example journeys go in `journeys/examples/` and must be generic.
 - **No secrets, ever.** There should be none to begin with. Add a `.gitignore` and an `.env.example` placeholder, and never commit credentials.
 - **Package identity.** Scoped npm package `@<owner>/wayforge` with a `wayforge` binary. Do not publish anything without the user's explicit go-ahead.
 - **Name hygiene.** Use "Wayforge" consistently. Do not reuse names of other projects in code or docs. A domain and trademark check is still pending; flag it before any public release.
 - **Before launch:** license file (ask which), `CONTRIBUTING.md`, CI running validation, parity and screenshot tests, and a README quick start that works on a clean machine.
+
+## Private data
+
+Dataset #1 (`journeys/lead-journey.json`) and the golden master (`reference/lead-journey.html`) live in the private repo `fernieggg/wayforge-private`, cloned next to this checkout as `../wayforge-private`, or wherever `WAYFORGE_PRIVATE_DIR` points. `tests/private.ts` resolves the paths. Tests that need the data skip when it is absent. Build dataset #1 with `npx wayforge build ../wayforge-private/journeys/lead-journey.json`. Edits to dataset #1 are commits in that repo, not this one.
+
+This repo's history before the split still contains both files. Before it goes public, remove them from history (`git filter-repo --invert-paths --path journeys/lead-journey.json --path reference/lead-journey.html`) or publish from a fresh repo.
 
 ## Tooling and commands
 

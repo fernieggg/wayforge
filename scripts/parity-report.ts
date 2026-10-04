@@ -1,15 +1,24 @@
-// Prints structural differences between the reference and the build for every scene.
+// Builds dataset #1 and prints structural differences from the reference, scene by scene.
+// Needs the private data repo (see tests/private.ts).
 // Usage: tsx scripts/parity-report.ts [light|dark] [reduce]
 import { chromium } from '@playwright/test';
 import { pathToFileURL } from 'node:url';
-import { resolve } from 'node:path';
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { buildFile } from '../src/cli/build';
+import { LEAD_JOURNEY, REFERENCE } from '../tests/private';
 import { align, capture, diff, goTo, LEAD_TARGETS, open } from '../tests/parity/harness';
 
 const scheme = (process.argv[2] as 'light' | 'dark') ?? 'light';
 const reducedMotion = process.argv[3] === 'reduce';
 const browser = await chromium.launch();
-const ref = await open(browser, pathToFileURL(resolve('reference/lead-journey.html')).href, { scheme, reducedMotion });
-const out = await open(browser, pathToFileURL(resolve('dist/lead-journey.html')).href, { scheme, reducedMotion });
+const html = await buildFile(LEAD_JOURNEY);
+if (html === null) process.exit(1);
+const built = join(tmpdir(), `wayforge-parity-${process.pid}.html`);
+writeFileSync(built, html);
+const ref = await open(browser, pathToFileURL(REFERENCE).href, { scheme, reducedMotion });
+const out = await open(browser, pathToFileURL(built).href, { scheme, reducedMotion });
 await align(ref, out);
 let total = 0;
 for (const t of LEAD_TARGETS) {

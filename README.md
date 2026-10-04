@@ -35,7 +35,7 @@ Open the built file in any browser. It is one self-contained page.
 
 ## Where things stand today
 
-v1 parity is in place. The engine reads a journey JSON file, validates it, and builds one self-contained page. Built from `journeys/lead-journey.json`, that page matches the hand-built reference `reference/lead-journey.html` in every scene of every lens, in light and dark mode, with and without reduced motion. The Playwright parity tests check this structurally (every element's computed look, the camera, the caption and the packet positions) and with screenshots. A second, unrelated journey (`journeys/examples/support-ticket.json`) builds with no engine changes.
+v1 parity is in place. The engine reads a journey JSON file, validates it, and builds one self-contained page. Built from dataset #1, that page matches the hand-built reference page in every scene of every lens, in light and dark mode, with and without reduced motion. The Playwright parity tests check this structurally (every element's computed look, the camera, the caption and the packet positions) and with screenshots. A second, unrelated journey (`journeys/examples/support-ticket.json`) builds with no engine changes.
 
 The reference file is the **golden master**. Do not edit it. Treat its rendered output as the specification.
 
@@ -175,10 +175,8 @@ Size: 20 nodes (15 data-driven plus 5 hand-built), 35 edges, 18 labels, 2 panels
 
 ```
 wayforge/
-  reference/lead-journey.html   golden master, never edited
   schema/                       journey.schema.json, theme.schema.json (published)
   themes/default.json           design tokens of the reference look
-  journeys/lead-journey.json    dataset #1 (private, see below)
   journeys/examples/            generic example journeys
   src/
     model/       loading, defaults, group expansion, lens visibility, generated schema types
@@ -190,6 +188,8 @@ wayforge/
   tests/         unit, validate (fixtures), constraints (built output), parity (Playwright)
   dist/          built pages (gitignored)
 ```
+
+Dataset #1 (`journeys/lead-journey.json`) and the golden master (`reference/lead-journey.html`) describe a real process, so they live in a separate private repository, `wayforge-private`. Clone it next to this one, or set `WAYFORGE_PRIVATE_DIR`. The parity tests use it when present and skip otherwise.
 
 ## Acceptance criteria for "v1: parity"
 
@@ -212,7 +212,7 @@ Wayforge is intended to become a public repository. That affects a few decisions
 
 - **Name.** An availability check on 2026-10-04 found no existing `wayforge` package on npm or PyPI, and the closest GitHub match was a small unrelated repo. Domains, company names and trademarks have **not** been checked. Do that before the first public release.
 - **Package.** Publish under a scoped npm name (`@<owner>/wayforge`) with a `wayforge` binary. A scoped name avoids most collisions.
-- **Dataset #1 is private-ish.** The lead journey names real systems and a real process. Before going public, either sanitize it into a generic example or keep it out of the public repo. The engine and schema must never depend on it.
+- **Dataset #1 is private.** The lead journey names real systems and a real process, so it lives in the private `wayforge-private` repo. This repo's history from before the split still contains it: remove it from history (or publish from a fresh repo) before going public. The engine and schema must never depend on it.
 - **Discoverability.** Because the name is a coined word, the repo description and topics do the search work. Suggested one-liner: "Diagram-as-code for animated, multi-lens journey and architecture presentations." Suggested topics: `diagram-as-code`, `visualization`, `svg`, `presentation`, `journey-map`, `architecture-diagram`.
 - **Housekeeping before launch:** choose a license, add `CONTRIBUTING.md`, add CI that runs validation, parity and screenshot tests, and include at least two non-proprietary example journeys.
 

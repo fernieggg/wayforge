@@ -4,9 +4,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { buildHtml } from '../../src/render/html';
 import { runtimeBundle } from '../../src/render/runtimeBundle';
 import { validateFile } from '../../src/validate';
+import { LEAD_JOURNEY } from '../private';
 
 const ROOT = resolve(__dirname, '../..');
-const JOURNEYS = ['journeys/examples/support-ticket.json', 'journeys/lead-journey.json'].filter((f) => existsSync(resolve(ROOT, f)));
+const JOURNEYS = [resolve(ROOT, 'journeys/examples/support-ticket.json'), LEAD_JOURNEY].filter((f) => existsSync(f));
 
 // Hosts that may appear in a built page. Only Google Fonts is fetched; the SVG namespace is an identifier, not a request.
 const ALLOWED_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'www.w3.org'];
@@ -18,7 +19,7 @@ const FORBIDDEN_APIS = [
 describe.each(JOURNEYS)('built output of %s', (journey) => {
   let html = '';
   beforeAll(async () => {
-    const { resolved, issues } = validateFile(resolve(ROOT, journey));
+    const { resolved, issues } = validateFile(journey);
     expect(issues.filter((i) => i.level === 'error')).toEqual([]);
     html = buildHtml(resolved!, await runtimeBundle());
   });

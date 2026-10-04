@@ -1,24 +1,23 @@
 import { expect, test, type Page } from '@playwright/test';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { buildFile } from '../../src/cli/build';
+import { HAS_LEAD_JOURNEY, HAS_REFERENCE, LEAD_JOURNEY, REFERENCE } from '../private';
 import { align, capture, captureTransitions, diff, goTo, LEAD_TARGETS, open, pixelDiff } from './harness';
 
 const ROOT = resolve(import.meta.dirname, '../..');
-const REFERENCE = resolve(ROOT, 'reference/lead-journey.html');
-const JOURNEY = resolve(ROOT, 'journeys/lead-journey.json');
+const JOURNEY = LEAD_JOURNEY;
 const BUILT = resolve(ROOT, `test-results/parity/lead-journey-${process.pid}.html`);
 const ARTIFACTS = resolve(ROOT, 'test-results/parity');
 // Font rendering differs by a few anti-aliased pixels at most; anything more is a real difference.
 const MAX_DIFF_RATIO = 0.0005;
 
-// Dataset #1 and the reference are private and may be removed before a public release.
-test.skip(!existsSync(REFERENCE) || !existsSync(JOURNEY), 'dataset #1 or the reference is not present');
+test.skip(!HAS_REFERENCE || !HAS_LEAD_JOURNEY, 'the private data repo (dataset #1 and the reference) is not present');
 
 test.beforeAll(async () => {
   const html = await buildFile(JOURNEY);
-  if (html === null) throw new Error('journeys/lead-journey.json failed validation');
+  if (html === null) throw new Error(`${JOURNEY} failed validation`);
   mkdirSync(ARTIFACTS, { recursive: true });
   writeFileSync(BUILT, html);
 });
