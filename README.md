@@ -18,15 +18,24 @@ journey.json  ──►  wayforge build  ──►  one self-contained animated 
 
 If a change requires editing engine code to support a new story, the engine is not done. That is a bug in the engine, not a feature request.
 
+## Quick start
+
+Requires Node 20 or later.
+
+```bash
+npm install
+npx playwright install chromium        # only needed for snapshot and the parity tests
+
+npx wayforge validate journeys/examples/support-ticket.json
+npx wayforge build    journeys/examples/support-ticket.json -o dist/support-ticket.html
+npx wayforge dev      journeys/examples/support-ticket.json     # http://localhost:5173, reloads on save
+```
+
+Open the built file in any browser. It is one self-contained page.
+
 ## Where things stand today
 
-There is one hand-built reference file: `reference/lead-journey.html` (about 38 KB, one self-contained page). It works and looks right, but **data and code are tangled together**:
-
-- Most content is already data-shaped JavaScript objects inside the file (`NODES`, `EDGES`, `LABELS`, `SCENES`, `PROSPECT`, `DATA`, `NODE_TAG`, `EDGE_TAG`, `P_SHIFT`, `ORDER`).
-- Some content is hard-coded in the rendering code: five hand-drawn nodes (a circle, two diamonds, and two containers with sub-rows), two background panels, pill labels, and every visual constant.
-- Coordinates and edge paths are typed by hand.
-
-The first job is to separate those two things without changing a single pixel of output. See `CLAUDE.md` for the full inventory of what to lift into data.
+v1 parity is in place. The engine reads a journey JSON file, validates it, and builds one self-contained page. Built from `journeys/lead-journey.json`, that page matches the hand-built reference `reference/lead-journey.html` in every scene of every lens, in light and dark mode, with and without reduced motion. The Playwright parity tests check this structurally (every element's computed look, the camera, the caption and the packet positions) and with screenshots. A second, unrelated journey (`journeys/examples/support-ticket.json`) builds with no engine changes.
 
 The reference file is the **golden master**. Do not edit it. Treat its rendered output as the specification.
 
@@ -39,7 +48,7 @@ The reference file is the **golden master**. Do not edit it. Treat its rendered 
 | **Node** | A box, circle, diamond or container on the map. Has a title, optional subtitle, optional pills, optional sub-rows. |
 | **Pill** | A small colored label that straddles a node's top edge and names the platform or owner (for example "Automator", "CRM", "Messenger"). |
 | **Edge** | A path between nodes. Solid or dashed, any accent color. Can be a hidden pass-through (see below). |
-| **Label** | Small text attached to an edge. Only visible while its edge is active. |
+| **Label** | Small text attached to an edge. Full strength while its edge is active, dimmed otherwise. |
 | **Panel** | A dashed rounded background that groups nodes and carries a title. |
 | **Layer** | A named group of elements (for example "data layer"). Layers can be shown ghosted (faded teaser) until a scene reveals them. |
 | **Lens** | A named view of the same map, such as "Prospect", "Data" or "Both". Each element declares which lenses show it. Lenses can also move nodes and swap in alternate edges. |
@@ -59,96 +68,81 @@ The reference file is the **golden master**. Do not edit it. Treat its rendered 
 - **Navigation**: Back/Next buttons, step dots, arrow keys, Home/End, `1 2 3` to switch lens, `F` for full screen, swipe on touch.
 - **Responsive**: works on phones (best in landscape) and respects safe-area insets.
 
-## Target data model (sketch)
+## Journey format
 
-This is a starting design, not a final schema. Claude Code should finalize it, publish it as JSON Schema, and validate every journey against it.
-
-Visibility is explicit lens lists, replacing the reference's cryptic one-letter tags (the mapping is in `CLAUDE.md`).
+A journey is one JSON file, validated against [`schema/journey.schema.json`](schema/journey.schema.json). Point your editor at it with `"$schema"` to get completion and inline docs. The look comes from a theme ([`themes/default.json`](themes/default.json), validated by [`schema/theme.schema.json`](schema/theme.schema.json)), which a journey picks with `"theme"` and can adjust with `"themeOverrides"`.
 
 ```jsonc
 {
-  "meta": { "title": "A lead's journey, from ad to agent", "favicon": "⚡" },
-
-  "layers": {
-    "data":  { "accent": "deep", "ghost": 0.45 },
-    "nurture": { "accent": "teal", "ghost": 0.38 }
-  },
-
-  "lenses": {
-    "prospect": { "label": "Prospect", "key": "1" },
-    "data":     { "label": "Data",     "key": "2" },
-    "both":     { "label": "Both",     "key": "3", "default": true }
-  },
-
-  "stageOrder": ["overview", "ads", "landing", "gate", "data", "sfrec", "lcap", "handoff", "full"],
-
-  "nodes": [
-    { "id": "wp", "kind": "box", "at": [700, 170], "size": [250, 90],
-      "title": "Landing page",
-      "pills": [{ "label": "CMS", "tone": "blue" }] },
-
-    { "id": "sf", "kind": "container", "at": [1930, 628], "size": [190, 184],
-      "title": "CRM records", "layer": "data",
-      "pills": [{ "label": "CRM", "tone": "violet" }],
-      "rows": ["Lead", "Contact", "History Record"] },
-
-    { "id": "book", "kind": "box", "at": [1830, 150], "size": [240, 100],
-      "title": "Booking screen", "sub": "meet with an agent",
-      "lenses": ["prospect", "both"],
-      "positionByLens": { "prospect": [0, 102] } }
+  "$schema": "../schema/journey.schema.json",
+  "version": 1,
+  "meta": { "title": "A support ticket, start to finish", "brand": "Support flow" },
+  "lenses": [
+    { "id": "customer", "label": "Customer" },
+    { "id": "team", "label": "Team", "default": true }
   ],
-
-  "edges": [
-    { "id": "cwp", "path": "M546 302 C625 302 625 215 700 215" },
-    { "id": "bk_thru", "path": "M1830 200 L2070 235", "hidden": true, "lenses": ["both"] },
-    { "id": "pnb", "path": "M2070 314 C2190 314 2190 417 2330 417",
-      "accent": "teal", "lenses": ["prospect"] }
-  ],
-
-  "labels": [
-    { "edge": "pnb", "at": [2316, 446], "anchor": "end", "text": "not booked" }
-  ],
-
+  "layers": [{ "id": "ops", "tone": "lime", "ghost": 0.4 }],
+  "stageOrder": ["overview", "submit", "triage", "work"],
+  "groups": { "lane": ["customer", "portal", "triage", "agent"] },
   "panels": [
-    { "id": "datalayer", "rect": [1060, 545, 1925, 350], "layer": "data",
-      "title": { "at": [1262, 582], "text": "The data layer, behind the form" },
-      "lenses": ["data", "both"] }
+    { "id": "backoffice", "rect": [780, 450, 760, 280], "tone": "lime", "layer": "ops", "lenses": ["team"],
+      "title": { "text": "Behind the scenes", "at": [806, 484] } }
   ],
-
+  "nodes": [
+    { "id": "portal", "kind": "box", "at": [240, 205], "size": [220, 90], "title": "Help center",
+      "subtitle": "contact form", "pills": [{ "text": "Web", "tone": "blue" }] },
+    { "id": "agent", "kind": "box", "at": [860, 330], "size": [240, 90], "title": "Support agent",
+      "offsetByLens": { "customer": [0, -125] } },
+    { "id": "queue", "kind": "container", "at": [820, 500], "size": [320, 200], "title": "Support queue",
+      "layer": "ops", "rows": ["Assign an owner", "Set priority"], "lenses": ["team"] }
+  ],
+  "edges": [
+    { "id": "ta", "path": "M740 250 C800 250 800 375 860 375", "lenses": ["team"] },
+    { "id": "a_thru", "path": "M860 375 L1100 375", "hidden": true, "lenses": ["team"] },
+    { "id": "qa", "path": "M980 500 L980 420", "layer": "ops", "lenses": ["team"] }
+  ],
+  "labels": [{ "edge": "ta", "at": [818, 296], "text": "routine" }],
   "scenes": {
-    "both": [
-      {
-        "key": "gate",
-        "label": "Form gate",
-        "title": "The form decides who sees the booking screen",
-        "text": "Logic on the form decides whether the prospect continues...",
-        "camera": [1440, 60, 2400, 780],
-        "layers": ["nurture"],
-        "active": { "nodes": ["gate", "book", "booked"], "edges": ["fg", "gb", "bkd"] },
-        "routes": [
-          { "path": ["fg", "gb", "thru_bkd", "bkd"], "delay": 0 },
-          { "path": ["fg", "gn"], "delay": 6.4, "dim": true }
-        ]
-      }
+    "customer": [
+      { "key": "submit", "label": "Ask", "title": "You ask for help", "caption": "You fill out the contact form.",
+        "camera": [200, 100, 800, 330], "active": { "nodes": ["portal"] } }
     ],
-    "prospect": [],
-    "data": []
+    "team": [
+      { "key": "work", "label": "Queue", "title": "Working the queue", "caption": "Each ticket gets an owner.",
+        "camera": [760, 300, 820, 460], "layers": ["ops"],
+        "active": { "nodes": ["agent", "queue"], "edges": ["qa"] },
+        "routes": [{ "edges": ["qa"] }, { "edges": ["ta", "a_thru"], "phase": 1.5, "dim": true }],
+        "effects": [{ "type": "cycleRows", "node": "queue" }] }
+    ]
   }
 }
 ```
 
-Scene effects that are currently hard-coded and should become data: cycling highlight through a container's rows (the qualification steps), and statically highlighting one row (the "History Record" trigger).
+The rules that matter most:
 
-## Commands (to be built)
+- `at` is the top-left of a node's bounding box, for every kind (`box`, `circle`, `diamond`, `container`).
+- `lenses` left out means every lens. `lenses: []` parks an element: it stays in the data and is never shown.
+- Array order is paint order.
+- Scene `active` lists accept `"@group"` references.
+- A route's `phase` (seconds) staggers its packet against the others; `dim` draws it fainter.
+- Labels inherit their edge's layer and lenses.
+- Any object can carry `notes`. Use them to flag placeholder titles.
+
+`wayforge validate` rejects broken references and their paths, for example `scenes.both[3].routes[1].edges[2]: unknown edge "thru_bk" (scene "gate")`. It also warns about likely mistakes: text too small to read for the camera, packets jumping between edges outside a node, rows overflowing a container.
+
+## Commands
 
 ```bash
-wayforge validate journeys/lead-journey.json     # schema + reference-integrity checks
-wayforge build    journeys/lead-journey.json -o dist/lead-journey.html
-wayforge dev      journeys/lead-journey.json     # live reload while editing data
-wayforge snapshot journeys/lead-journey.json     # PNG of every scene in every lens
+wayforge validate <journey.json> [--strict]                 # schema, integrity and lint checks
+wayforge build    <journey.json> [-o out.html] [--strict]   # one self-contained HTML file (default dist/<name>.html)
+wayforge dev      <journey.json> [--port 5173]              # serve, rebuild and reload on save
+wayforge snapshot <journey.json> [--lens id] [--theme light|dark] [-o dir]   # PNG of every scene
+npm test                                                     # unit, validation and output-constraint tests
+npm run test:parity                                          # Playwright parity against the reference (skips if absent)
+npm run parity:report                                        # readable structural diff, scene by scene
 ```
 
-`validate` must catch the mistakes that were made by hand during development: a scene or route referencing an edge or node id that does not exist, a packet route that uses a parked or hidden-in-this-lens edge, a node with no position, duplicate ids, and a lens with no scenes.
+`--strict` turns warnings into errors. In a source checkout, `npx wayforge …` runs the CLI directly from TypeScript.
 
 ## Output constraints
 
@@ -177,28 +171,24 @@ Size: 20 nodes (15 data-driven plus 5 hand-built), 35 edges, 18 labels, 2 panels
 
 **Parked, not deleted:** the "Booked?" filter, "Never enters", the Capture Event / not-booked / booked lines into that filter, and the Messenger panel. They stay in the data, hidden in every lens, so they can be restored as a lighter chapter later.
 
-## Proposed repo layout
+## Repo layout
 
 ```
 wayforge/
-  README.md
-  CLAUDE.md
-  package.json
-  reference/
-    lead-journey.html          # golden master, never edited
-  schema/
-    journey.schema.json
+  reference/lead-journey.html   golden master, never edited
+  schema/                       journey.schema.json, theme.schema.json (published)
+  themes/default.json           design tokens of the reference look
+  journeys/lead-journey.json    dataset #1 (private, see below)
+  journeys/examples/            generic example journeys
   src/
-    engine/                    # generic renderer: camera, packets, lenses, scenes, layout
-    themes/                    # token sets (light, dark)
-    cli/                       # build, validate, dev, snapshot
-    template.html
-  journeys/
-    lead-journey.json          # dataset #1
-  tests/
-    parity/                    # screenshot comparison against the reference
-    validate/                  # good and bad journey fixtures
-  dist/                        # built single-file output (gitignored)
+    model/       loading, defaults, group expansion, lens visibility, generated schema types
+    geometry/    pure layout math: shapes, text and pill placement, path parsing
+    validate/    JSON Schema, reference integrity, lints
+    render/      build-time HTML: CSS from the theme, SVG, page chrome, runtime data
+    runtime/     browser code (camera, packets, lenses, scenes, effects, input), bundled and inlined
+    cli/         validate, build, dev, snapshot
+  tests/         unit, validate (fixtures), constraints (built output), parity (Playwright)
+  dist/          built pages (gitignored)
 ```
 
 ## Acceptance criteria for "v1: parity"
