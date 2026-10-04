@@ -1,0 +1,201 @@
+{
+  "$schema": "../../schema/journey.schema.json",
+  "version": 1,
+  "meta": {
+    "title": "A support ticket, start to finish",
+    "brand": "Support flow",
+    "description": "A customer opens a ticket in the help center. Triage rules send urgent tickets to the on-call engineer and routine ones to an agent, who works them from the support queue. Fixes are written up in the knowledge base, and a satisfaction survey follows a day later.",
+    "favicon": "🎫"
+  },
+  "notes": "Generic example journey. Exists to prove the engine needs no changes for a different story.",
+  "theme": "default",
+  "themeOverrides": {
+    "colors": {
+      "light": {
+        "bg": "#f2f5f3", "node-line": "#bccfc5", "packet": "#e8590c",
+        "sky": "#0b7bbf", "mint": "#0f8f64", "mint-soft": "rgba(15,143,100,.14)", "mint-panel": "rgba(15,143,100,.05)",
+        "amber": "#b86200", "amber-soft": "rgba(184,98,0,.14)", "rose": "#d63a5a"
+      },
+      "dark": {
+        "bg": "#0a1210", "node": "#10201b", "node-line": "#2c4a40", "muted": "#8fb3a5", "glass": "rgba(10,18,16,.8)",
+        "grid": "rgba(120,255,200,.08)", "glow": "rgba(67,224,168,.08)", "btn-ink": "#04110c", "packet": "#ffa94d",
+        "sky": "#58c4ff", "mint": "#43e0a8", "mint-soft": "rgba(67,224,168,.18)", "mint-panel": "rgba(67,224,168,.05)",
+        "amber": "#ffb547", "amber-soft": "rgba(255,181,71,.16)", "rose": "#ff8aa0"
+      }
+    },
+    "tones": {
+      "sky": { "color": "sky" },
+      "mint": { "color": "mint", "soft": "mint-soft", "panel": "mint-panel" },
+      "amber": { "color": "amber", "soft": "amber-soft" },
+      "rose": { "color": "rose" }
+    },
+    "defaultTone": "sky"
+  },
+  "ui": {
+    "hint": "Arrow keys step through, {keys} change the view"
+  },
+  "lenses": [
+    { "id": "customer", "label": "Customer" },
+    { "id": "team", "label": "Team", "default": true }
+  ],
+  "layers": [
+    { "id": "ops", "tone": "mint", "ghost": 0.4 },
+    { "id": "followup", "tone": "amber", "ghost": 0.4 }
+  ],
+  "stageOrder": ["overview", "submit", "triage", "work", "resolve", "followup"],
+  "groups": {
+    "lane": ["customer", "portal", "triage", "agent", "resolved", "survey"],
+    "teamNodes": ["@lane", "oncall", "queue", "kb"],
+    "customerEdges": ["cp", "pt", "c_ta", "c_ar", "rs"],
+    "teamEdges": ["cp", "pt", "ta", "ar", "to", "or", "pq", "qa", "rk", "rs"]
+  },
+  "panels": [
+    {
+      "id": "backoffice", "rect": [780, 450, 760, 280], "tone": "mint", "layer": "ops", "lenses": ["team"],
+      "title": { "text": "Behind the scenes", "at": [806, 484] }
+    }
+  ],
+  "nodes": [
+    { "id": "customer", "kind": "circle", "at": [60, 200], "size": [100, 100], "title": "You", "subtitle": "need help" },
+    {
+      "id": "portal", "kind": "box", "at": [240, 205], "size": [220, 90], "title": "Help center", "subtitle": "contact form",
+      "pills": [{ "text": "Web", "tone": "sky" }]
+    },
+    { "id": "triage", "kind": "diamond", "at": [560, 160], "size": [180, 180], "title": "Urgent?", "subtitle": "triage rules" },
+    {
+      "id": "oncall", "kind": "box", "at": [860, 40], "size": [240, 90], "title": "On-call engineer", "subtitle": "paged right away",
+      "tone": "rose", "outline": "strong", "pills": [{ "text": "Pager", "tone": "rose" }], "lenses": ["team"]
+    },
+    {
+      "id": "agent", "kind": "box", "at": [860, 330], "size": [240, 90], "title": "Support agent", "subtitle": "first reply",
+      "offsetByLens": { "customer": [0, -125] }
+    },
+    { "id": "resolved", "kind": "box", "at": [1240, 205], "size": [220, 90], "title": "Resolved", "subtitle": "you confirm the fix" },
+    {
+      "id": "survey", "kind": "box", "at": [1600, 205], "size": [240, 90], "title": "Quick survey", "subtitle": "how did we do?",
+      "layer": "followup", "pills": [{ "text": "Email", "tone": "amber", "hideIn": ["customer"] }]
+    },
+    {
+      "id": "queue", "kind": "container", "at": [820, 500], "size": [320, 200], "title": "Support queue", "layer": "ops",
+      "pills": [{ "text": "Helpdesk", "tone": "mint" }],
+      "rows": ["Assign an owner", "Set priority", "Reply within the SLA"], "lenses": ["team"]
+    },
+    {
+      "id": "kb", "kind": "container", "at": [1240, 500], "size": [260, 160], "title": "Knowledge base", "layer": "ops",
+      "rowStyle": "tint", "pills": [{ "text": "Wiki", "tone": "mint" }],
+      "rows": ["Draft article", { "id": "published", "text": "Publish article" }], "lenses": ["team"]
+    }
+  ],
+  "edges": [
+    { "id": "cp", "path": "M160 250 L240 250" },
+    { "id": "pt", "path": "M460 250 L560 250" },
+    { "id": "ta", "path": "M740 250 C800 250 800 375 860 375", "lenses": ["team"] },
+    { "id": "a_thru", "path": "M860 375 L1100 375", "hidden": true, "lenses": ["team"] },
+    { "id": "ar", "path": "M1100 375 C1170 375 1170 250 1240 250", "lenses": ["team"] },
+    { "id": "c_ta", "path": "M740 250 L860 250", "lenses": ["customer"] },
+    { "id": "c_thru", "path": "M860 250 L1100 250", "hidden": true, "lenses": ["customer"] },
+    { "id": "c_ar", "path": "M1100 250 L1240 250", "lenses": ["customer"] },
+    { "id": "to", "path": "M650 160 L650 125 Q650 85 690 85 L860 85", "tone": "rose", "dashed": true, "lenses": ["team"] },
+    { "id": "or", "path": "M1100 85 L1310 85 Q1350 85 1350 125 L1350 205", "tone": "rose", "lenses": ["team"] },
+    { "id": "pq", "path": "M350 295 L350 560 Q350 600 390 600 L820 600", "layer": "ops", "lenses": ["team"] },
+    { "id": "qa", "path": "M980 500 L980 420", "layer": "ops", "lenses": ["team"] },
+    { "id": "rk", "path": "M1350 295 L1350 500", "layer": "ops", "lenses": ["team"] },
+    { "id": "rs", "path": "M1460 250 L1600 250", "layer": "followup" }
+  ],
+  "labels": [
+    { "edge": "pt", "at": [510, 238], "anchor": "middle", "text": "submits" },
+    { "edge": "ta", "at": [818, 296], "text": "routine" },
+    { "edge": "to", "at": [664, 130], "text": "urgent" },
+    { "edge": "or", "at": [1220, 73], "anchor": "middle", "text": "fixed" },
+    { "edge": "ar", "at": [1150, 300], "anchor": "end", "text": "solved" },
+    { "edge": "c_ar", "at": [1170, 238], "anchor": "middle", "text": "solved" },
+    { "edge": "pq", "at": [364, 460], "text": "new ticket" },
+    { "edge": "qa", "at": [994, 470], "text": "assigned" },
+    { "edge": "rk", "at": [1364, 400], "text": "write up the fix" },
+    { "edge": "rs", "at": [1530, 238], "anchor": "middle", "text": "a day later" }
+  ],
+  "scenes": {
+    "customer": [
+      {
+        "key": "overview", "label": "Overview", "title": "Getting help, from your side",
+        "caption": "You ask for help, someone picks it up, the problem gets solved, and a day later we ask how it went.",
+        "camera": [20, 20, 1860, 400], "wide": true, "layers": ["followup"],
+        "active": { "nodes": ["@lane"], "edges": ["@customerEdges"] },
+        "routes": [{ "edges": ["cp", "pt", "c_ta", "c_thru", "c_ar", "rs"] }]
+      },
+      {
+        "key": "submit", "label": "Ask", "title": "You ask for help",
+        "caption": "You open the help center and fill out the contact form.",
+        "camera": [20, 100, 760, 330],
+        "active": { "nodes": ["customer", "portal", "triage"], "edges": ["cp", "pt"] },
+        "routes": [{ "edges": ["cp", "pt"] }]
+      },
+      {
+        "key": "triage", "label": "Reply", "title": "Someone picks it up",
+        "caption": "A support agent replies and works on the problem until it is solved.",
+        "camera": [530, 90, 960, 360],
+        "active": { "nodes": ["triage", "agent", "resolved"], "edges": ["c_ta", "c_ar"] },
+        "routes": [{ "edges": ["c_ta", "c_thru", "c_ar"] }]
+      },
+      {
+        "key": "followup", "label": "Survey", "title": "We ask how it went",
+        "caption": "A day after the fix, a short survey asks how we did.",
+        "camera": [1180, 120, 700, 300], "layers": ["followup"],
+        "active": { "nodes": ["resolved", "survey"], "edges": ["rs"] },
+        "routes": [{ "edges": ["rs"] }]
+      }
+    ],
+    "team": [
+      {
+        "key": "overview", "label": "Overview", "title": "How a ticket moves through the team",
+        "caption": "Every request becomes a ticket in one queue. Triage decides who handles it, fixes feed the knowledge base, and a survey closes the loop.",
+        "camera": [20, 0, 1860, 760], "wide": true, "layers": ["ops", "followup"],
+        "active": { "nodes": ["@teamNodes"], "edges": ["@teamEdges"] },
+        "routes": [
+          { "edges": ["cp", "pt", "ta", "a_thru", "ar", "rs"] },
+          { "edges": ["pq"], "phase": 2 }
+        ]
+      },
+      {
+        "key": "submit", "label": "Intake", "title": "Every request lands in one queue",
+        "caption": "The contact form creates a ticket in the support queue, whatever the request is about.",
+        "camera": [20, 100, 1180, 640], "layers": ["ops"],
+        "active": { "nodes": ["customer", "portal", "queue"], "edges": ["cp", "pq"] },
+        "routes": [{ "edges": ["cp", "pq"] }]
+      },
+      {
+        "key": "triage", "label": "Triage", "title": "Urgent tickets skip the line",
+        "caption": "Triage rules page the on-call engineer for urgent tickets. Routine tickets go to an agent.",
+        "camera": [520, 0, 980, 480],
+        "active": { "nodes": ["triage", "oncall", "agent", "resolved"], "edges": ["ta", "ar", "to", "or"] },
+        "routes": [
+          { "edges": ["ta", "a_thru", "ar"] },
+          { "edges": ["to", "or"], "phase": 2.4 }
+        ]
+      },
+      {
+        "key": "work", "label": "Queue", "title": "Working the queue",
+        "caption": "Each ticket gets an owner and a priority, and a reply within the service level.",
+        "camera": [760, 300, 820, 460], "layers": ["ops"],
+        "active": { "nodes": ["agent", "queue"], "edges": ["qa"] },
+        "routes": [{ "edges": ["qa"] }],
+        "effects": [{ "type": "cycleRows", "node": "queue" }]
+      },
+      {
+        "key": "resolve", "label": "Knowledge", "title": "Fixes become articles",
+        "caption": "Once a ticket is resolved, the fix is written up and published so the next customer can help themselves.",
+        "camera": [1080, 180, 640, 520], "layers": ["ops"],
+        "active": { "nodes": ["resolved", "kb"], "edges": ["rk"] },
+        "routes": [{ "edges": ["rk"] }],
+        "effects": [{ "type": "highlightRow", "node": "kb", "row": "published" }]
+      },
+      {
+        "key": "followup", "label": "Survey", "title": "Then we ask how it went",
+        "caption": "A day after the fix, the customer gets a short survey by email.",
+        "camera": [1180, 120, 700, 300], "layers": ["followup"],
+        "active": { "nodes": ["resolved", "survey"], "edges": ["rs"] },
+        "routes": [{ "edges": ["rs"] }]
+      }
+    ]
+  }
+}
