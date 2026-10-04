@@ -66,7 +66,10 @@ export type Rect1 = [number, number, number, number];
  * Layers switched on in this scene.
  */
 export type IdList1 = Id[];
-export type Effect =
+export type Effect = {
+  type: 'cycleRows' | 'highlightRow';
+} & Effect1;
+export type Effect1 =
   | {
       type: 'cycleRows';
       node: Id;

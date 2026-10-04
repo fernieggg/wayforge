@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "meta": { "title": "Minimal" },
+  "lenses": [
+    { "id": "user", "label": "User" },
+    { "id": "system", "label": "System", "default": true }
+  ],
+  "layers": [{ "id": "back", "tone": "violet", "ghost": 0.4 }],
+  "stageOrder": ["start", "middle", "end"],
+  "groups": { "all": ["a", "c"] },
+  "nodes": [
+    { "id": "a", "kind": "box", "at": [0, 0], "size": [200, 80], "title": "A" },
+    { "id": "b", "kind": "circle", "at": [300, 0], "size": [80, 80], "title": "B", "lenses": ["user"] },
+    { "id": "c", "kind": "container", "at": [500, 0], "size": [240, 200], "title": "C", "layer": "back",
+      "rows": ["one", { "id": "two", "text": "two" }] }
+  ],
+  "edges": [
+    { "id": "ab", "path": "M200 40 L300 40" },
+    { "id": "bc", "path": "M380 40 L500 40", "lenses": ["user"] },
+    { "id": "ac", "path": "M100 80 L100 140 L500 140", "layer": "back", "lenses": ["system"] }
+  ],
+  "labels": [{ "edge": "ab", "at": [250, 30], "anchor": "middle", "text": "goes" }],
+  "scenes": {
+    "user": [
+      { "key": "start", "label": "Start", "title": "Start", "caption": "A to B.", "camera": [0, 0, 800, 300],
+        "active": { "nodes": ["a", "b"], "edges": ["ab"] }, "routes": [{ "edges": ["ab", "bc"] }] }
+    ],
+    "system": [
+      { "key": "start", "label": "Start", "title": "Start", "caption": "A.", "camera": [0, 0, 800, 300],
+        "active": { "nodes": ["@all"], "edges": ["ac"] }, "routes": [{ "edges": ["ac"], "phase": 1 }],
+        "effects": [{ "type": "cycleRows", "node": "c" }] },
+      { "key": "end", "label": "End", "title": "End", "caption": "C.", "camera": [400, 0, 400, 300],
+        "layers": ["back"], "active": { "nodes": ["c"] },
+        "effects": [{ "type": "highlightRow", "node": "c", "row": "two" }] }
+    ]
+  }
+}
