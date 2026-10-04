@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit",
     "test": "npm run build:runtime && vitest run",
     "test:parity": "npm run build:runtime && playwright test",
-    "wayforge": "tsx src/cli/index.ts"
+    "wayforge": "tsx src/cli/index.ts",
+    "parity:report": "tsx scripts/parity-report.ts"
   },
   "dependencies": {
     "ajv": "^8.20.0"
