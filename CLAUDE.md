@@ -95,14 +95,14 @@ Each lens has its own ordered scene list. A scene has:
 
 - Edges are SVG paths. Corners are rounded with `Q` curves. Dashed edges use a `7 9` dash.
 - A **hidden edge** draws nothing but can be part of a packet route. It connects an incoming edge to an outgoing edge *through* a node (for example, from where a packet enters the booking screen to where it leaves). Without these, packets would jump between edges.
-- A label is attached to one edge and is visible only while that edge is active. Labels are placed manually today. Keep them clear of curves.
+- A label is attached to one edge. It is full strength while that edge is active and dimmed (base 0.35) otherwise; it is never hidden by activity alone. Labels are placed manually today. Keep them clear of curves.
 
 ### Packets
 
 - A packet is a bright head with a glow (blurred circle) and a fading tail of 7 dots spaced 15 units apart.
 - Speed is 300 map units per second. After finishing, a route holds for 0.9 s, then repeats.
 - A route is an ordered list of edge ids. Packets follow the combined length. Opacity fades in and out over 50 units at each end.
-- Each route has a start `delay` in seconds (used to stagger packets) and an optional `dim` (opacity x 0.45).
+- Each route has a `phase` in seconds (used to stagger packets) and an optional `dim` (opacity x 0.45). `phase` is a clock offset, not a start delay: the head sits at `((now + phase) mod (travel + hold)) x speed`, where `now` is page time, not scene time.
 - **Packets render beneath node shapes.** Do not move them above. This is what makes them look like they pass *through* a node.
 - With reduced motion on, show one static packet at 55% of each route.
 
@@ -110,15 +110,15 @@ Each lens has its own ordered scene list. A scene has:
 
 - The map is one SVG. The camera is the `viewBox`, with `preserveAspectRatio="xMidYMid meet"`, so a camera rectangle with a different aspect ratio than the screen simply shows extra map around it.
 - Moves tween the viewBox over 1.3 s with a cubic ease in-out. Reduced motion jumps instantly.
-- **Readability rule of thumb:** on-screen text size is about `screenWidth / cameraWidth x fontSize`. Very wide cameras (the full picture) produce tiny text. That is acceptable for an overview shot, not for a content step. A lint for this belongs in `validate`.
+- **Readability rule of thumb:** on-screen text size is about `screenWidth / cameraWidth x fontSize`. Very wide cameras (the full picture) produce tiny text. That is acceptable for an overview shot, not for a content step. The `readability` lint in `validate` warns about this; mark establishing shots `"wide": true` to exempt them.
 
 ### Nodes, pills and rows
 
 - Kinds in use: rounded box, circle, diamond, and **container** (a title plus stacked sub-rows).
 - Box: corner radius 16 (containers 20). Title is left-aligned with a 22-unit inset. With a subtitle, the title baseline sits 2 units above center and the subtitle 24 below; with no subtitle, the title sits 8 below center. Font sizes: title 22, subtitle 17, container title 21, row 18.
-- **Pill:** a 24-unit-high rounded label straddling the node's top edge, right-aligned with a 10-unit inset. Width is `characters x 7.6 + 26`. Text uses the "button ink" token for contrast on its fill. Pills name the platform or owner. The pill color is a token (`blue`, `violet`, `pink`, `lime`, `teal` in the reference).
+- **Pill:** a 24-unit-high rounded label straddling the node's top edge, right-aligned with a 10-unit inset. Width defaults to `characters x 7.6 + 26` and can be set per pill (the reference's Automator and Messenger pills are 82 wide). Text uses the "button ink" token for contrast on its fill. Pills name the platform or owner. The pill color is a token (`blue`, `violet`, `pink`, `lime`, `teal` in the reference).
 - A pill can be hidden in specific lenses (the Messenger pill hides in the Prospect lens, which avoids naming systems).
-- Container rows: height 32, pitch 40, inset 24 from the container edge.
+- Container rows: height 32, pitch 40, inset 24 from the container edge by default. Containers can override their layout per node (`metrics`): the reference's CRM container uses inset 16, title at (+20, +40) and rows from +60.
 
 ### Theming
 
@@ -190,7 +190,7 @@ A change is done only when all of these hold:
 
 1. **Parity.** `journeys/lead-journey.json` builds a file whose screenshots match the reference for every scene in every lens, in light and dark mode. Expected step counts: Prospect 6, Data 5, Both 8. Allow a tiny pixel tolerance for font rendering only.
 2. **Engine-ness.** The `journeys/examples/` journey (a small, deliberately different story) still builds with no engine changes. If you add a feature, add a field to that example or a second one.
-3. **Validation.** `wayforge validate` fails on: unknown node or edge ids in scenes, routes and labels; routes through an edge not visible in that scene's lens; duplicate ids; nodes without positions; lenses with no scenes; scenes whose `key` is missing from `stageOrder`; cameras so wide that on-screen text would drop below a configurable minimum.
+3. **Validation.** `wayforge validate` fails on: unknown node or edge ids in scenes, routes and labels; routes through an edge not visible in that scene's lens; duplicate ids; nodes without positions; lenses with no scenes; scenes whose `key` is missing from `stageOrder`. It warns (and fails with `--strict`) on cameras so wide that on-screen text would drop below a configurable minimum. This is a warning rather than an error because the golden master itself has one such content scene (Both, "Form gate").
 4. **Constraints.** The output passes every check in "Output and hosting constraints." Add an automated test that scans the built file for external URLs and forbidden APIs.
 5. `npm test` passes.
 
