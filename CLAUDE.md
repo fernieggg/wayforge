@@ -116,9 +116,9 @@ Each lens has its own ordered scene list. A scene has:
 
 - Kinds in use: rounded box, circle, diamond, and **container** (a title plus stacked sub-rows).
 - Box: corner radius 16 (containers 20). Title is left-aligned with a 22-unit inset. With a subtitle, the title baseline sits 2 units above center and the subtitle 24 below; with no subtitle, the title sits 8 below center. Font sizes: title 22, subtitle 17, container title 21, row 18.
-- **Pill:** a 24-unit-high rounded label straddling the node's top edge, right-aligned with a 10-unit inset. Width defaults to `characters x 7.6 + 26` and can be set per pill (the reference's Automator and Messenger pills are 82 wide). Text uses the "button ink" token for contrast on its fill. Pills name the platform or owner. The pill color is a token (`blue`, `violet`, `pink`, `lime`, `teal` in the reference).
-- A pill can be hidden in specific lenses (the Messenger pill hides in the Prospect lens, which avoids naming systems).
-- Container rows: height 32, pitch 40, inset 24 from the container edge by default. Containers can override their layout per node (`metrics`): the reference's CRM container uses inset 16, title at (+20, +40) and rows from +60.
+- **Pill:** a 24-unit-high rounded label straddling the node's top edge, right-aligned with a 10-unit inset. Width defaults to `characters x 7.6 + 26` and can be set per pill (the reference sets some pills to a fixed 82). Text uses the "button ink" token for contrast on its fill. Pills name the platform or owner. The pill color is a token (`blue`, `violet`, `pink`, `lime`, `teal` in the reference).
+- A pill can be hidden in specific lenses (the reference hides one platform pill in one lens, to avoid naming systems there).
+- Container rows: height 32, pitch 40, inset 24 from the container edge by default. Containers can override their layout per node (`metrics`): one of the reference's containers uses inset 16, title at (+20, +40) and rows from +60.
 
 ### Theming
 
@@ -128,25 +128,9 @@ Colors are CSS variables: `--bg --ink --muted --node --node-line --panel --sys -
 
 Back and Next buttons, one dot per scene, arrow keys, Page Up/Down, space, Home and End, `1 2 3` to select lens (in the order defined by the journey's lenses), `F` for full screen (hidden if unavailable), and swipe left or right on touch.
 
-## Inventory: what the reference hard-codes and must become data
+## Inventory: what the reference hard-codes
 
-Extract these into the schema. Where a value is a magic number, make it a theme or schema default.
-
-**Hand-built nodes (not in the `NODES` array):**
-
-| Node | Shape | Position | Notes |
-|---|---|---|---|
-| `click` | circle | center (500, 302), r 46 | caption "prospect clicks" below |
-| `gate` | diamond | center (1560, 302), half-width 90 | "Qualified?" with "form logic" below |
-| `filter` | diamond | center (2720, 720), half-width 100 | "Booked?" (parked) |
-| `flow` | container | (1470, 600), 360 x 240 | "Qualification recipe", Automator pill, 4 rows that cycle highlight |
-| `sf` | container | (1930, 628), 190 x 184 | "CRM records", CRM pill, rows Lead / Contact / History Record |
-
-**Panels (hand-drawn):** the "data layer, behind the form" panel (1060, 545, 1925 x 350) and the parked "Messenger: the nurture journey" panel (2480, 420, 850 x 475).
-
-**Other hard-coded values:** all pill labels and widths, the per-lens `P_SHIFT` offsets, the global `ORDER`, the lens-tag tables (`NODE_TAG`, `EDGE_TAG`), packet constants, camera tween duration, scene effects (row cycling and the History Record highlight), the keyboard map, the font stacks, and the default camera.
-
-**Already data-shaped in the reference** (extract as-is): `NODES`, `EDGES`, `LABELS`, and the three scene arrays `SCENES` (Both), `PROSPECT`, `DATA`.
+Everything the reference hard-codes (hand-built nodes, panels, pill labels and widths, per-lens offsets, lens tags, stage order, packet and camera constants, scene effects, the keyboard map, font stacks) is now data: journey fields or `themes/default.json`. The original inventory is kept in `wayforge-private/NOTES.md`.
 
 ## Output and hosting constraints
 
@@ -174,7 +158,7 @@ The repo will become public. Build with that in mind from the start:
 
 Dataset #1 (`journeys/lead-journey.json`) and the golden master (`reference/lead-journey.html`) live in a separate local repo, `../wayforge-private` next to this checkout, or wherever `WAYFORGE_PRIVATE_DIR` points. Both repos are local-only for now: do not create remotes or push without the user's go-ahead. `tests/private.ts` resolves the paths. Tests that need the data skip when it is absent. Build dataset #1 with `npx wayforge build ../wayforge-private/journeys/lead-journey.json`. Edits to dataset #1 are commits in that repo, not this one.
 
-This repo's history before the split still contains both files. Before it goes public, remove them from history (`git filter-repo --invert-paths --path journeys/lead-journey.json --path reference/lead-journey.html`) or publish from a fresh repo.
+Neither file appears in this repo or its history (history was rewritten with `git filter-repo`; the pre-rewrite history is archived in `wayforge-private/archive/`). Keep it that way: dataset-specific names, notes and open questions go in `wayforge-private/NOTES.md`.
 
 ## Tooling and commands
 

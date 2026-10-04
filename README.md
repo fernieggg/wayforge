@@ -46,7 +46,7 @@ The reference file is the **golden master**. Do not edit it. Treat its rendered 
 | Concept | What it is |
 |---|---|
 | **Node** | A box, circle, diamond or container on the map. Has a title, optional subtitle, optional pills, optional sub-rows. |
-| **Pill** | A small colored label that straddles a node's top edge and names the platform or owner (for example "Automator", "CRM", "Messenger"). |
+| **Pill** | A small colored label that straddles a node's top edge and names the platform or owner (for example "CRM", "Email", "Wiki"). |
 | **Edge** | A path between nodes. Solid or dashed, any accent color. Can be a hidden pass-through (see below). |
 | **Label** | Small text attached to an edge. Full strength while its edge is active, dimmed otherwise. |
 | **Panel** | A dashed rounded background that groups nodes and carries a title. |
@@ -155,21 +155,9 @@ The built file must be **one self-contained HTML file** that can be hosted anywh
 - Include `viewport-fit=cover` and respect `env(safe-area-inset-*)`.
 - Theme from CSS variables, with a dark theme under `prefers-color-scheme: dark` and manual `data-theme` overrides.
 
-## Dataset #1: the lead journey
+## Dataset #1
 
-A prospect's path from an ad to a booking, and what happens to their data along the way. Three lenses:
-
-| Lens | Steps |
-|---|---|
-| **Prospect** (6) | Overview, Ads, Landing pages, Form gate, Nurture, Full picture |
-| **Data** (5) | Overview, Webhook, Qualification, CRM, Capture Event |
-| **Both** (8) | Overview, Ads, Landing pages, Form gate, Data layer, Capture Event, Nurture handoff, Full picture |
-
-Systems on the map: ads on four platforms; landing pages on CMS and on a proprietary React app; a form with a qualification gate; a booking screen with Booked / Not booked outcomes; a nurture journey in Messenger that loops back to the booking screen; Automator recipes (intake, qualification, Capture Event); CRM records (Lead, Contact, History Record); Events.
-
-Size: 20 nodes (15 data-driven plus 5 hand-built), 35 edges, 18 labels, 2 panels.
-
-**Parked, not deleted:** the "Booked?" filter, "Never enters", the Capture Event / not-booked / booked lines into that filter, and the Messenger panel. They stay in the data, hidden in every lens, so they can be restored as a lighter chapter later.
+The first dataset is a real lead journey: three lenses (Prospect, Data, Both) with 6, 5 and 8 steps, 20 nodes, 35 edges and 18 labels. It names real systems, so the dataset, the golden master and their notes live in the private `wayforge-private` repository, not here.
 
 ## Repo layout
 
@@ -212,21 +200,6 @@ Wayforge is intended to become a public repository. That affects a few decisions
 
 - **Name.** An availability check on 2026-10-04 found no existing `wayforge` package on npm or PyPI, and the closest GitHub match was a small unrelated repo. Domains, company names and trademarks have **not** been checked. Do that before the first public release.
 - **Package.** Publish under a scoped npm name (`@<owner>/wayforge`) with a `wayforge` binary. A scoped name avoids most collisions.
-- **Dataset #1 is private.** The lead journey names real systems and a real process, so it lives in the private `wayforge-private` repo. This repo's history from before the split still contains it: remove it from history (or publish from a fresh repo) before going public. The engine and schema must never depend on it.
+- **Dataset #1 is private.** The lead journey names real systems and a real process, so it lives in the private `wayforge-private` repo. It never appears in this repository or its history. The engine and schema must never depend on it.
 - **Discoverability.** Because the name is a coined word, the repo description and topics do the search work. Suggested one-liner: "Diagram-as-code for animated, multi-lens journey and architecture presentations." Suggested topics: `diagram-as-code`, `visualization`, `svg`, `presentation`, `journey-map`, `architecture-diagram`.
 - **Housekeeping before launch:** choose a license, add `CONTRIBUTING.md`, add CI that runs validation, parity and screenshot tests, and include at least two non-proprietary example journeys.
-
-## Starting with Claude Code
-
-Put `README.md`, `CLAUDE.md` and `lead-journey.html` (renamed into `reference/`) in a new repo called `wayforge`, open Claude Code in it, and start with something like:
-
-> Read README.md and CLAUDE.md. Then read reference/lead-journey.html. Before writing any code, propose the final JSON schema and the engine's module layout, and wait for my approval. The goal is an engine: the lead journey is just the first dataset.
-
-## Open content questions for dataset #1
-
-These came out of building the first version. None block the engine.
-
-- Some titles are placeholders chosen to pair with platform pills: "CRM records" (CRM) and "Event routing" (Events). Confirm or replace.
-- Automator recipe names ("Intake recipe", "Qualification recipe", "Capture Event recipe") are descriptive, not the real recipe names.
-- The Both-lens full picture is very wide and its text is small by design; it works as a closing shot, not for reading.
-- Arrows have no arrowheads. Direction is conveyed by packets and labels. Decide whether the engine should offer arrowheads as an option.
