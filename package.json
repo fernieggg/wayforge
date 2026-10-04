@@ -1,0 +1,33 @@
+{
+  "name": "wayforge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Diagram-as-code for animated, multi-lens journey and architecture presentations.",
+  "type": "module",
+  "bin": {
+    "wayforge": "bin/wayforge.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build:runtime": "vite build",
+    "gen:types": "node scripts/gen-types.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build:runtime && vitest run",
+    "test:parity": "npm run build:runtime && playwright test",
+    "wayforge": "tsx src/cli/index.ts"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4",
+    "json-schema-to-typescript": "^16.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}

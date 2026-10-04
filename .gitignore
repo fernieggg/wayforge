@@ -1,0 +1,8 @@
+node_modules/
+dist/
+dist-runtime/
+snapshots/
+test-results/
+playwright-report/
+.env
+*.log
