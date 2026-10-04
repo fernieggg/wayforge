@@ -1,0 +1,771 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wayforge.dev/schema/journey.schema.json",
+  "title": "Wayforge journey",
+  "description": "A journey or architecture described as data: nodes, edges, labels and panels on one map, viewed through lenses, walked through as scenes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "meta",
+    "lenses",
+    "stageOrder",
+    "nodes",
+    "edges",
+    "scenes"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "meta": {
+      "$ref": "#/$defs/meta"
+    },
+    "theme": {
+      "description": "A built-in theme name (themes/<name>.json) or a path relative to the journey file.",
+      "type": "string",
+      "default": "default"
+    },
+    "themeOverrides": {
+      "description": "Deep-partial theme merged over the chosen theme. The merged theme is validated against theme.schema.json.",
+      "type": "object"
+    },
+    "ui": {
+      "$ref": "#/$defs/ui"
+    },
+    "lenses": {
+      "description": "Ordered. Order sets the lens buttons and the number keys 1..n.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/lens"
+      }
+    },
+    "layers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/layer"
+      },
+      "default": []
+    },
+    "stageOrder": {
+      "description": "Global order of scene keys, used to keep the presenter's place when switching lenses.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "groups": {
+      "description": "Named id lists. Reference one inside a scene's active lists as \"@name\". Groups may include other groups.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/refList"
+      },
+      "default": {}
+    },
+    "panels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/panel"
+      },
+      "default": []
+    },
+    "nodes": {
+      "description": "Array order is paint order.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "description": "Array order is paint order.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/label"
+      },
+      "default": []
+    },
+    "scenes": {
+      "description": "One ordered scene list per lens id.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/scene"
+        }
+      }
+    },
+    "notes": {
+      "$ref": "#/$defs/notes"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+    },
+    "ref": {
+      "description": "An id, or \"@group\".",
+      "type": "string",
+      "pattern": "^@?[A-Za-z][A-Za-z0-9_-]*$"
+    },
+    "idList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "refList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ref"
+      }
+    },
+    "notes": {
+      "description": "Author notes. Never rendered. Use them to flag placeholders.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "point": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "size": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "rect": {
+      "description": "[x, y, width, height] in map units.",
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "lenses": {
+      "description": "Lenses that show this element. Omitted means every lens; [] means parked (kept in the data, never shown).",
+      "$ref": "#/$defs/idList"
+    },
+    "tone": {
+      "description": "A tone name defined by the theme.",
+      "$ref": "#/$defs/id"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "brand": {
+          "type": "string"
+        },
+        "description": {
+          "description": "Accessible description of the whole map (SVG aria-label).",
+          "type": "string"
+        },
+        "lang": {
+          "type": "string",
+          "default": "en"
+        },
+        "favicon": {
+          "description": "An emoji or a data: URI.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "ui": {
+      "description": "Interface strings. {keys}, {n} and {label} are substituted.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "back": {
+          "type": "string"
+        },
+        "next": {
+          "type": "string"
+        },
+        "fullscreen": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "lensGroup": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "string"
+        },
+        "step": {
+          "type": "string"
+        }
+      }
+    },
+    "lens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "tone",
+        "ghost"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "tone": {
+          "$ref": "#/$defs/tone"
+        },
+        "ghost": {
+          "description": "Opacity factor for this layer's elements while a scene has the layer switched off.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "panel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "rect",
+        "tone"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "rect": {
+          "$ref": "#/$defs/rect"
+        },
+        "tone": {
+          "$ref": "#/$defs/tone"
+        },
+        "layer": {
+          "$ref": "#/$defs/id"
+        },
+        "lenses": {
+          "$ref": "#/$defs/lenses"
+        },
+        "title": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text",
+            "at"
+          ],
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "at": {
+              "$ref": "#/$defs/point"
+            }
+          }
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "pill": {
+      "description": "A small label straddling the node's top edge, right-aligned. Names the platform or owner.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "tone"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tone": {
+          "$ref": "#/$defs/tone"
+        },
+        "width": {
+          "description": "Defaults to round(chars x charWidth + padding) from the theme.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "hideIn": {
+          "description": "Lenses in which this pill fades out.",
+          "$ref": "#/$defs/idList"
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "row": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            },
+            "notes": {
+              "$ref": "#/$defs/notes"
+            }
+          }
+        }
+      ]
+    },
+    "nodeMetrics": {
+      "description": "Per-node override of the theme's metrics for this node's kind.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "radius": {
+          "type": "number",
+          "minimum": 0
+        },
+        "inset": {
+          "type": "number"
+        },
+        "titleDy": {
+          "type": "number"
+        },
+        "titleDySub": {
+          "type": "number"
+        },
+        "subDy": {
+          "type": "number"
+        },
+        "subGap": {
+          "type": "number"
+        },
+        "titleOffset": {
+          "$ref": "#/$defs/point"
+        },
+        "rowsTop": {
+          "type": "number"
+        },
+        "rowInset": {
+          "type": "number"
+        },
+        "rowTextInset": {
+          "type": "number"
+        },
+        "rowHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rowPitch": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rowRadius": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "at",
+        "size",
+        "title"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "box",
+            "circle",
+            "diamond",
+            "container"
+          ]
+        },
+        "at": {
+          "description": "Top-left of the bounding box, for every kind.",
+          "$ref": "#/$defs/point"
+        },
+        "size": {
+          "description": "Bounding box [width, height].",
+          "$ref": "#/$defs/size"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "layer": {
+          "$ref": "#/$defs/id"
+        },
+        "tone": {
+          "description": "Active outline tone. Defaults to the layer's tone, else the theme's default tone.",
+          "$ref": "#/$defs/tone"
+        },
+        "outline": {
+          "enum": [
+            "normal",
+            "strong"
+          ],
+          "default": "normal"
+        },
+        "pills": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pill"
+          }
+        },
+        "rows": {
+          "description": "Containers only.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/row"
+          }
+        },
+        "rowStyle": {
+          "description": "Containers only. outline: rows take the node's outline while active. tint: rows fill with the tone's soft color while active.",
+          "enum": [
+            "outline",
+            "tint"
+          ],
+          "default": "outline"
+        },
+        "lenses": {
+          "$ref": "#/$defs/lenses"
+        },
+        "offsetByLens": {
+          "description": "Translate the node by [dx, dy] in specific lenses. Animated with a glide.",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/id"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/point"
+          }
+        },
+        "metrics": {
+          "$ref": "#/$defs/nodeMetrics"
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "path": {
+          "description": "SVG path data in map units.",
+          "type": "string",
+          "minLength": 1
+        },
+        "layer": {
+          "$ref": "#/$defs/id"
+        },
+        "tone": {
+          "description": "Active stroke tone. Defaults to the layer's tone, else the theme's default tone.",
+          "$ref": "#/$defs/tone"
+        },
+        "dashed": {
+          "type": "boolean",
+          "default": false
+        },
+        "hidden": {
+          "description": "Draws nothing. Used inside packet routes to carry a packet through a node.",
+          "type": "boolean",
+          "default": false
+        },
+        "lenses": {
+          "$ref": "#/$defs/lenses"
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "label": {
+      "description": "Text attached to an edge. Full strength while the edge is active, dimmed otherwise.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "edge",
+        "at",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "edge": {
+          "$ref": "#/$defs/id"
+        },
+        "at": {
+          "$ref": "#/$defs/point"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "anchor": {
+          "enum": [
+            "start",
+            "middle",
+            "end"
+          ],
+          "default": "start"
+        },
+        "layer": {
+          "description": "Defaults to the edge's layer.",
+          "$ref": "#/$defs/id"
+        },
+        "lenses": {
+          "description": "Defaults to the edge's lenses.",
+          "$ref": "#/$defs/lenses"
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "edges"
+      ],
+      "properties": {
+        "edges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "phase": {
+          "description": "Seconds added to the clock for this packet, so packets in one scene are staggered.",
+          "type": "number",
+          "default": 0
+        },
+        "dim": {
+          "description": "Draw this packet fainter.",
+          "type": "boolean",
+          "default": false
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    },
+    "effect": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "node"
+          ],
+          "properties": {
+            "type": {
+              "const": "cycleRows"
+            },
+            "node": {
+              "$ref": "#/$defs/id"
+            },
+            "interval": {
+              "description": "Seconds per row. Defaults to the theme.",
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "node",
+            "row"
+          ],
+          "properties": {
+            "type": {
+              "const": "highlightRow"
+            },
+            "node": {
+              "$ref": "#/$defs/id"
+            },
+            "row": {
+              "description": "A row id.",
+              "$ref": "#/$defs/id"
+            }
+          }
+        }
+      ]
+    },
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "label",
+        "title",
+        "caption",
+        "camera",
+        "active"
+      ],
+      "properties": {
+        "key": {
+          "description": "The stage this scene represents. Must appear in stageOrder.",
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "description": "Step dot tooltip.",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "caption": {
+          "type": "string"
+        },
+        "camera": {
+          "description": "[x, y, width, height] of the map to frame.",
+          "$ref": "#/$defs/rect"
+        },
+        "layers": {
+          "description": "Layers switched on in this scene.",
+          "$ref": "#/$defs/idList"
+        },
+        "active": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "nodes": {
+              "$ref": "#/$defs/refList"
+            },
+            "edges": {
+              "$ref": "#/$defs/refList"
+            }
+          }
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/route"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        },
+        "wide": {
+          "description": "An establishing shot. Exempt from the readability lint.",
+          "type": "boolean",
+          "default": false
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,589 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wayforge.dev/schema/theme.schema.json",
+  "title": "Wayforge theme",
+  "description": "Design tokens: colors for light and dark, tones, fonts, metrics, motion and packet style.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fonts",
+    "colors",
+    "defaultTone",
+    "tones",
+    "opacity",
+    "metrics",
+    "motion",
+    "packet",
+    "background",
+    "lint"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "fonts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "heading",
+        "text"
+      ],
+      "properties": {
+        "heading": {
+          "$ref": "#/$defs/font"
+        },
+        "text": {
+          "$ref": "#/$defs/font"
+        }
+      }
+    },
+    "colors": {
+      "description": "CSS custom properties (names without the leading --) for each color scheme.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "light",
+        "dark"
+      ],
+      "properties": {
+        "light": {
+          "$ref": "#/$defs/palette"
+        },
+        "dark": {
+          "$ref": "#/$defs/palette"
+        }
+      }
+    },
+    "defaultTone": {
+      "description": "Tone for active elements with no layer or tone of their own, and for interface accents.",
+      "type": "string"
+    },
+    "tones": {
+      "description": "Named accent tones, each pointing at color variables.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "color"
+        ],
+        "properties": {
+          "color": {
+            "description": "Variable for strokes, pills and panel outlines.",
+            "type": "string"
+          },
+          "soft": {
+            "description": "Variable for row fills and highlights.",
+            "type": "string"
+          },
+          "panel": {
+            "description": "Variable for panel fills.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "opacity": {
+      "description": "Base opacity of inactive elements, and the factor for dim packets.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "edge",
+        "label",
+        "dim"
+      ],
+      "properties": {
+        "node": {
+          "$ref": "#/$defs/unit"
+        },
+        "edge": {
+          "$ref": "#/$defs/unit"
+        },
+        "label": {
+          "$ref": "#/$defs/unit"
+        },
+        "dim": {
+          "$ref": "#/$defs/unit"
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "box",
+        "circle",
+        "diamond",
+        "container",
+        "pill",
+        "edge",
+        "panel",
+        "type"
+      ],
+      "properties": {
+        "box": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "radius",
+            "inset",
+            "titleDy",
+            "titleDySub",
+            "subDy",
+            "stroke",
+            "strongStroke"
+          ],
+          "properties": {
+            "radius": {
+              "type": "number"
+            },
+            "inset": {
+              "description": "Left inset of title and subtitle.",
+              "type": "number"
+            },
+            "titleDy": {
+              "description": "Title baseline below center when there is no subtitle.",
+              "type": "number"
+            },
+            "titleDySub": {
+              "description": "Title baseline below center when there is a subtitle.",
+              "type": "number"
+            },
+            "subDy": {
+              "description": "Subtitle baseline below center.",
+              "type": "number"
+            },
+            "stroke": {
+              "description": "Outline width of every node shape.",
+              "type": "number"
+            },
+            "strongStroke": {
+              "description": "Active outline width for outline: strong.",
+              "type": "number"
+            }
+          }
+        },
+        "circle": {
+          "$ref": "#/$defs/roundShape"
+        },
+        "diamond": {
+          "$ref": "#/$defs/roundShape"
+        },
+        "container": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "radius",
+            "titleOffset",
+            "rowsTop",
+            "rowInset",
+            "rowTextInset",
+            "rowHeight",
+            "rowPitch",
+            "rowRadius",
+            "rowTextDy",
+            "rowStroke",
+            "highlightFillOpacity",
+            "highlightStroke"
+          ],
+          "properties": {
+            "radius": {
+              "type": "number"
+            },
+            "titleOffset": {
+              "description": "Title baseline position from the container's top-left.",
+              "$ref": "#/$defs/pair"
+            },
+            "rowsTop": {
+              "description": "Top of the first row from the container's top.",
+              "type": "number"
+            },
+            "rowInset": {
+              "description": "Horizontal inset of rows from the container's edges.",
+              "type": "number"
+            },
+            "rowTextInset": {
+              "description": "Row text inset from the row's left edge.",
+              "type": "number"
+            },
+            "rowHeight": {
+              "type": "number"
+            },
+            "rowPitch": {
+              "type": "number"
+            },
+            "rowRadius": {
+              "type": "number"
+            },
+            "rowTextDy": {
+              "description": "Row text baseline from the row's top.",
+              "type": "number"
+            },
+            "rowStroke": {
+              "type": "number"
+            },
+            "highlightFillOpacity": {
+              "type": "number"
+            },
+            "highlightStroke": {
+              "type": "number"
+            }
+          }
+        },
+        "pill": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "height",
+            "inset",
+            "charWidth",
+            "padding",
+            "textDy"
+          ],
+          "properties": {
+            "height": {
+              "type": "number"
+            },
+            "inset": {
+              "description": "Gap between the pill's right end and the node's right edge.",
+              "type": "number"
+            },
+            "charWidth": {
+              "type": "number"
+            },
+            "padding": {
+              "type": "number"
+            },
+            "textDy": {
+              "description": "Text baseline below the node's top edge.",
+              "type": "number"
+            }
+          }
+        },
+        "edge": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stroke",
+            "activeStroke",
+            "dash"
+          ],
+          "properties": {
+            "stroke": {
+              "type": "number"
+            },
+            "activeStroke": {
+              "type": "number"
+            },
+            "dash": {
+              "$ref": "#/$defs/pair"
+            }
+          }
+        },
+        "panel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "radius",
+            "stroke",
+            "dash"
+          ],
+          "properties": {
+            "radius": {
+              "type": "number"
+            },
+            "stroke": {
+              "type": "number"
+            },
+            "dash": {
+              "$ref": "#/$defs/pair"
+            }
+          }
+        },
+        "type": {
+          "description": "Font sizes in map units.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "subtitle",
+            "containerTitle",
+            "row",
+            "label",
+            "panelTitle",
+            "pill"
+          ],
+          "properties": {
+            "title": {
+              "type": "number"
+            },
+            "subtitle": {
+              "type": "number"
+            },
+            "containerTitle": {
+              "type": "number"
+            },
+            "row": {
+              "type": "number"
+            },
+            "label": {
+              "type": "number"
+            },
+            "panelTitle": {
+              "type": "number"
+            },
+            "pill": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "motion": {
+      "description": "Durations in seconds unless noted.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fade",
+        "decorFade",
+        "stroke",
+        "glide",
+        "glideEase",
+        "camera",
+        "caption",
+        "pillFade",
+        "row",
+        "rowCycle",
+        "swipe"
+      ],
+      "properties": {
+        "fade": {
+          "description": "Opacity transitions of nodes, edges and labels.",
+          "type": "number"
+        },
+        "decorFade": {
+          "description": "Opacity transitions of panels.",
+          "type": "number"
+        },
+        "stroke": {
+          "description": "Node outline color transition.",
+          "type": "number"
+        },
+        "glide": {
+          "description": "Per-lens node movement.",
+          "type": "number"
+        },
+        "glideEase": {
+          "type": "string"
+        },
+        "camera": {
+          "description": "Camera move, cubic ease in-out.",
+          "type": "number"
+        },
+        "caption": {
+          "description": "Caption fade-out before the text swaps.",
+          "type": "number"
+        },
+        "pillFade": {
+          "type": "number"
+        },
+        "row": {
+          "description": "Row fill and stroke transitions.",
+          "type": "number"
+        },
+        "rowCycle": {
+          "description": "Default seconds per row for cycleRows.",
+          "type": "number"
+        },
+        "swipe": {
+          "description": "Minimum horizontal swipe in CSS pixels.",
+          "type": "number"
+        }
+      }
+    },
+    "packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "speed",
+        "hold",
+        "tail",
+        "gap",
+        "fade",
+        "headRadius",
+        "radiusStep",
+        "minRadius",
+        "glowRadius",
+        "glowBlur",
+        "glowOpacity",
+        "reducedMotionAt"
+      ],
+      "properties": {
+        "speed": {
+          "description": "Map units per second.",
+          "type": "number"
+        },
+        "hold": {
+          "description": "Seconds to wait after a route finishes before repeating.",
+          "type": "number"
+        },
+        "tail": {
+          "description": "Number of dots including the head.",
+          "type": "integer"
+        },
+        "gap": {
+          "description": "Spacing of tail dots in map units.",
+          "type": "number"
+        },
+        "fade": {
+          "description": "Fade-in and fade-out distance at each end of a route.",
+          "type": "number"
+        },
+        "headRadius": {
+          "type": "number"
+        },
+        "radiusStep": {
+          "type": "number"
+        },
+        "minRadius": {
+          "type": "number"
+        },
+        "glowRadius": {
+          "type": "number"
+        },
+        "glowBlur": {
+          "type": "number"
+        },
+        "glowOpacity": {
+          "type": "number"
+        },
+        "reducedMotionAt": {
+          "description": "Where the static packet sits along its route with reduced motion (0..1).",
+          "type": "number"
+        }
+      }
+    },
+    "background": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gridDot",
+        "gridSpacing"
+      ],
+      "properties": {
+        "gridDot": {
+          "type": "number"
+        },
+        "gridSpacing": {
+          "type": "number"
+        }
+      }
+    },
+    "lint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minTextPx",
+        "referenceScreenWidth"
+      ],
+      "properties": {
+        "minTextPx": {
+          "description": "Smallest acceptable on-screen text size.",
+          "type": "number"
+        },
+        "referenceScreenWidth": {
+          "description": "Screen width in CSS pixels assumed by the readability lint.",
+          "type": "number"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "unit": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "pair": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family",
+        "weights",
+        "fallback"
+      ],
+      "properties": {
+        "family": {
+          "type": "string"
+        },
+        "weights": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1
+        },
+        "google": {
+          "description": "Load this family from Google Fonts.",
+          "type": "boolean",
+          "default": true
+        },
+        "fallback": {
+          "type": "string"
+        }
+      }
+    },
+    "palette": {
+      "type": "object",
+      "required": [
+        "bg",
+        "ink",
+        "muted",
+        "node",
+        "node-line",
+        "glass",
+        "btn-ink",
+        "grid",
+        "glow",
+        "packet"
+      ],
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "roundShape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "titleDy",
+        "subGap"
+      ],
+      "properties": {
+        "titleDy": {
+          "description": "Title baseline below center.",
+          "type": "number"
+        },
+        "subGap": {
+          "description": "Subtitle baseline below the shape's bottom.",
+          "type": "number"
+        }
+      }
+    }
+  }
+}
