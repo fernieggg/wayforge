@@ -78,12 +78,14 @@
     {
       "id": "queue", "kind": "container", "at": [820, 500], "size": [320, 200], "title": "Support queue", "layer": "ops",
       "pills": [{ "text": "Helpdesk", "tone": "mint" }],
-      "rows": ["Assign an owner", "Set priority", "Reply within the SLA"], "lenses": ["team"]
+      "rows": ["Assign an owner", "Set priority", "Reply within the SLA"], "lenses": ["team"],
+      "zoom": { "journey": "./support-queue.json", "label": "Support queue" }
     },
     {
       "id": "kb", "kind": "container", "at": [1240, 500], "size": [260, 160], "title": "Knowledge base", "layer": "ops",
       "rowStyle": "tint", "pills": [{ "text": "Wiki", "tone": "mint" }],
-      "rows": ["Draft article", { "id": "published", "text": "Publish article" }], "lenses": ["team"]
+      "rows": ["Draft article", { "id": "published", "text": "Publish article" }], "lenses": ["team"],
+      "zoom": { "journey": "./knowledge-base.json" }
     }
   ],
   "edges": [
@@ -179,7 +181,8 @@
         "camera": [760, 300, 820, 460], "layers": ["ops"],
         "active": { "nodes": ["agent", "queue"], "edges": ["qa"] },
         "routes": [{ "edges": ["qa"] }],
-        "effects": [{ "type": "cycleRows", "node": "queue" }]
+        "effects": [{ "type": "cycleRows", "node": "queue" }],
+        "enter": "queue"
       },
       {
         "key": "resolve", "label": "Knowledge", "title": "Fixes become articles",

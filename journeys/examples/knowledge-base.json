@@ -1,0 +1,63 @@
+{
+  "$schema": "../../schema/journey.schema.json",
+  "version": 1,
+  "meta": {
+    "title": "Knowledge base",
+    "description": "An article is drafted from a resolved ticket, reviewed by a second agent and published in the help center, where customers find it through search."
+  },
+  "notes": "Generic example sub-flow, opened by clicking the knowledge base in support-ticket.json. Its lenses do not match the parent's, so it opens in its own default.",
+  "lenses": [
+    { "id": "authors", "label": "Authors" },
+    { "id": "readers", "label": "Readers", "default": true }
+  ],
+  "stageOrder": ["overview", "review", "find"],
+  "nodes": [
+    { "id": "draft", "kind": "box", "at": [40, 120], "size": [240, 90], "title": "Draft", "subtitle": "from a resolved ticket" },
+    { "id": "review", "kind": "diamond", "at": [360, 75], "size": [180, 180], "title": "Review", "subtitle": "a second agent checks" },
+    { "id": "live", "kind": "box", "at": [620, 120], "size": [240, 90], "title": "Published", "subtitle": "in the help center" },
+    {
+      "id": "search", "kind": "circle", "at": [960, 115], "size": [100, 100], "title": "Search", "subtitle": "customers find it",
+      "lenses": ["readers"]
+    }
+  ],
+  "edges": [
+    { "id": "d1", "path": "M280 165 L360 165" },
+    { "id": "d2", "path": "M540 165 L620 165" },
+    { "id": "d3", "path": "M860 165 L960 165", "lenses": ["readers"] }
+  ],
+  "labels": [{ "edge": "d2", "at": [580, 153], "anchor": "middle", "text": "approved" }],
+  "scenes": {
+    "authors": [
+      {
+        "key": "overview", "label": "Overview", "title": "From fix to article",
+        "caption": "An agent drafts an article from the resolved ticket, and a second agent reviews it before it goes live.",
+        "camera": [0, 20, 900, 330],
+        "active": { "nodes": ["draft", "review", "live"], "edges": ["d1", "d2"] },
+        "routes": [{ "edges": ["d1", "d2"] }]
+      },
+      {
+        "key": "review", "label": "Review", "title": "Every article gets a second look",
+        "caption": "Review checks that the article is accurate and readable before customers see it.",
+        "camera": [240, 40, 520, 250],
+        "active": { "nodes": ["review", "live"], "edges": ["d2"] },
+        "routes": [{ "edges": ["d2"] }]
+      }
+    ],
+    "readers": [
+      {
+        "key": "overview", "label": "Overview", "title": "How answers reach customers",
+        "caption": "Reviewed articles are published in the help center, where customers search for answers themselves.",
+        "camera": [0, 20, 1100, 330],
+        "active": { "nodes": ["draft", "review", "live", "search"], "edges": ["d1", "d2", "d3"] },
+        "routes": [{ "edges": ["d1", "d2", "d3"] }]
+      },
+      {
+        "key": "find", "label": "Search", "title": "Customers find the answer",
+        "caption": "Search surfaces the published article, often before a ticket is ever opened.",
+        "camera": [580, 40, 520, 260],
+        "active": { "nodes": ["live", "search"], "edges": ["d3"] },
+        "routes": [{ "edges": ["d3"] }]
+      }
+    ]
+  }
+}

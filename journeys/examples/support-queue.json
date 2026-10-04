@@ -1,0 +1,81 @@
+{
+  "$schema": "../../schema/journey.schema.json",
+  "version": 1,
+  "meta": {
+    "title": "Inside the support queue",
+    "description": "New tickets from every channel pass routing rules, get an owner through assignment, and receive a first reply within the SLA. A team lead watches for escalations."
+  },
+  "notes": "Generic example sub-flow, opened from the support queue in support-ticket.json. Also builds on its own.",
+  "lenses": [
+    { "id": "team", "label": "Team", "default": true },
+    { "id": "lead", "label": "Team lead" }
+  ],
+  "stageOrder": ["overview", "intake", "assign", "reply", "escalate"],
+  "nodes": [
+    { "id": "inbox", "kind": "box", "at": [40, 180], "size": [220, 90], "title": "New tickets", "subtitle": "from every channel" },
+    { "id": "rules", "kind": "diamond", "at": [340, 135], "size": [180, 180], "title": "Rules", "subtitle": "routing and tags" },
+    {
+      "id": "owner", "kind": "container", "at": [600, 120], "size": [300, 210], "title": "Assignment", "tone": "violet",
+      "rows": ["Round robin", "Skill match", "Load check"]
+    },
+    { "id": "reply", "kind": "box", "at": [980, 180], "size": [220, 90], "title": "First reply", "subtitle": "within the SLA" },
+    {
+      "id": "lead", "kind": "box", "at": [600, 400], "size": [300, 80], "title": "Team lead", "subtitle": "watches the backlog",
+      "lenses": ["lead"]
+    }
+  ],
+  "edges": [
+    { "id": "e1", "path": "M260 225 L340 225" },
+    { "id": "e2", "path": "M520 225 L600 225" },
+    { "id": "thru", "path": "M600 225 L900 225", "hidden": true },
+    { "id": "e3", "path": "M900 225 L980 225" },
+    { "id": "e4", "path": "M750 330 L750 400", "dashed": true, "lenses": ["lead"] }
+  ],
+  "labels": [
+    { "edge": "e2", "at": [560, 213], "anchor": "middle", "text": "routed" },
+    { "edge": "e3", "at": [940, 213], "anchor": "middle", "text": "owned" },
+    { "edge": "e4", "at": [764, 372], "text": "escalates" }
+  ],
+  "scenes": {
+    "team": [
+      {
+        "key": "intake", "label": "Intake", "title": "Every ticket starts in one inbox",
+        "caption": "Email, chat and the contact form all land in the same list, and routing rules tag each ticket.",
+        "camera": [0, 60, 600, 300],
+        "active": { "nodes": ["inbox", "rules"], "edges": ["e1"] },
+        "routes": [{ "edges": ["e1"] }]
+      },
+      {
+        "key": "assign", "label": "Assign", "title": "Assignment finds an owner",
+        "caption": "Tickets go round robin, matched to skills, with a check that nobody is overloaded.",
+        "camera": [300, 60, 660, 330],
+        "active": { "nodes": ["rules", "owner"], "edges": ["e2"] },
+        "routes": [{ "edges": ["e2"] }],
+        "effects": [{ "type": "cycleRows", "node": "owner" }]
+      },
+      {
+        "key": "reply", "label": "Reply", "title": "The owner replies within the SLA",
+        "caption": "The first reply goes out within the service level, and the ticket moves on.",
+        "camera": [560, 60, 700, 330],
+        "active": { "nodes": ["owner", "reply"], "edges": ["e3"] },
+        "routes": [{ "edges": ["e2", "thru", "e3"] }]
+      }
+    ],
+    "lead": [
+      {
+        "key": "overview", "label": "Overview", "title": "The queue, from the lead's chair",
+        "caption": "The lead sees the same path, plus the escalations that need a second pair of eyes.",
+        "camera": [0, 40, 1240, 500],
+        "active": { "nodes": ["inbox", "rules", "owner", "reply", "lead"], "edges": ["e1", "e2", "e3", "e4"] },
+        "routes": [{ "edges": ["e1", "e2", "thru", "e3"] }]
+      },
+      {
+        "key": "escalate", "label": "Escalate", "title": "Some tickets need the lead",
+        "caption": "When assignment cannot find an owner in time, the ticket escalates to the team lead.",
+        "camera": [500, 100, 560, 420],
+        "active": { "nodes": ["owner", "lead"], "edges": ["e4"] },
+        "routes": [{ "edges": ["e4"] }]
+      }
+    ]
+  }
+}
