@@ -172,7 +172,7 @@ The repo will become public. Build with that in mind from the start:
 
 ## Private data
 
-Dataset #1 (`journeys/lead-journey.json`) and the golden master (`reference/lead-journey.html`) live in the private repo `fernieggg/wayforge-private`, cloned next to this checkout as `../wayforge-private`, or wherever `WAYFORGE_PRIVATE_DIR` points. `tests/private.ts` resolves the paths. Tests that need the data skip when it is absent. Build dataset #1 with `npx wayforge build ../wayforge-private/journeys/lead-journey.json`. Edits to dataset #1 are commits in that repo, not this one.
+Dataset #1 (`journeys/lead-journey.json`) and the golden master (`reference/lead-journey.html`) live in a separate local repo, `../wayforge-private` next to this checkout, or wherever `WAYFORGE_PRIVATE_DIR` points. Both repos are local-only for now: do not create remotes or push without the user's go-ahead. `tests/private.ts` resolves the paths. Tests that need the data skip when it is absent. Build dataset #1 with `npx wayforge build ../wayforge-private/journeys/lead-journey.json`. Edits to dataset #1 are commits in that repo, not this one.
 
 This repo's history before the split still contains both files. Before it goes public, remove them from history (`git filter-repo --invert-paths --path journeys/lead-journey.json --path reference/lead-journey.html`) or publish from a fresh repo.
 
