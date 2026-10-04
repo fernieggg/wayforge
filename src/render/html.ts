@@ -1,12 +1,21 @@
-import type { ResolvedJourney, Theme } from '../model/types';
+import type { Flow } from '../model/tree';
+import type { Theme } from '../model/types';
 import { buildFooter, buildHeader } from './chrome';
 import { buildCss } from './css';
 import { attrs, esc, scriptJson } from './escape';
 import { runtimeData } from './runtimeData';
 import { buildSvg } from './svg';
 
-export function googleFontsUrl(theme: Theme): string | null {
-  const fonts = [theme.fonts.text, theme.fonts.heading].filter((f) => f.google !== false);
+/** One stylesheet link for every Google font used by any flow (root fonts first, as in the reference). */
+export function googleFontsUrl(themes: readonly Theme[]): string | null {
+  const seen = new Set<string>();
+  const fonts = themes
+    .flatMap((t) => [t.fonts.text, t.fonts.heading])
+    .filter((f) => f.google !== false)
+    .filter((f) => {
+      const key = `${f.family}:${[...f.weights].sort((a, b) => a - b).join(';')}`;
+      return seen.has(key) ? false : (seen.add(key), true);
+    });
   if (!fonts.length) return null;
   const families = fonts.map((f) => `family=${f.family.replace(/ /g, '+')}:wght@${[...f.weights].sort((a, b) => a - b).join(';')}`);
   return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
@@ -20,11 +29,12 @@ function favicon(icon: string | undefined): string {
   return `\n<link${attrs({ rel: 'icon', href })}>`;
 }
 
-/** Assembles the single self-contained page. `runtimeJs` is the bundled browser runtime. */
-export function buildHtml(r: ResolvedJourney, runtimeJs: string): string {
+/** Assembles the single self-contained page from a flow tree (the root and its sub-flows). */
+export function buildHtml(flows: readonly Flow[], runtimeJs: string): string {
+  const r = flows[0]!.resolved;
   const lens = r.defaultLens;
   const scenes = r.scenes[lens]!;
-  const fonts = googleFontsUrl(r.theme);
+  const fonts = googleFontsUrl(flows.map((f) => f.resolved.theme));
   const fontLinks = fonts
     ? `\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link${attrs({ href: fonts, rel: 'stylesheet' })}>`
     : '';
@@ -36,16 +46,16 @@ export function buildHtml(r: ResolvedJourney, runtimeJs: string): string {
 <meta name="generator" content="Wayforge">
 <title>${esc(r.meta.title)}</title>${favicon(r.meta.favicon)}${fontLinks}
 <style>
-${buildCss(r)}
+${buildCss(flows)}
 </style>
 </head>
 <body>
 ${buildHeader(r, lens)}
 <main>
-${buildSvg(r, { lens, scene: scenes[0]! })}
+${buildSvg(flows)}
 </main>
 ${buildFooter(r, scenes, 0)}
-<script type="application/json" id="wf-data">${scriptJson(runtimeData(r))}</script>
+<script type="application/json" id="wf-data">${scriptJson(runtimeData(flows))}</script>
 <script>${runtimeJs.replace(/<\/script/gi, '<\\/script')}</script>
 </body>
 </html>

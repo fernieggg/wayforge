@@ -4,13 +4,20 @@ export interface Controls {
   first(): void;
   last(): void;
   lens(index: number): void;
+  exit(): void;
+  activate(el: Element): void;
 }
 
 export function bindInput(c: Controls, swipeMin: number) {
   document.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key;
-    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || (k === 'Enter' && document.activeElement === document.body)) {
+    const focused = document.activeElement;
+    if ((k === 'Enter' || k === ' ') && focused?.classList.contains('zoomable')) {
+      e.preventDefault();
+      c.activate(focused);
+    } else if (k === 'Escape') c.exit();
+    else if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || (k === 'Enter' && document.activeElement === document.body)) {
       e.preventDefault();
       c.step(1);
     } else if (k === 'ArrowLeft' || k === 'PageUp') {

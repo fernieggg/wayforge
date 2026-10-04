@@ -15,6 +15,7 @@ export function buildHeader(r: ResolvedJourney, lens: string): string {
     .map((l) => `<button${attrs({ class: 'lens-btn', type: 'button', 'data-lens': l.id, 'aria-pressed': String(l.id === lens) })}>${esc(l.label)}</button>`)
     .join('');
   return `<header>
+  <nav class="crumbs" hidden${attrs({ 'aria-label': r.ui.breadcrumb })}></nav>
   <div class="brand">${esc(r.meta.brand ?? '')}</div>
   <div class="lens" role="group"${attrs({ 'aria-label': r.ui.lensGroup, hidden: !multi && 'hidden' })}>${buttons}</div>
   <div class="hdr-right">

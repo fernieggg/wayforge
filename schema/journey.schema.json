@@ -252,6 +252,10 @@
         "exit": {
           "description": "Breadcrumb button label for leaving to a level. {title} is that level.",
           "type": "string"
+        },
+        "breadcrumb": {
+          "description": "Accessible name of the breadcrumb shown inside sub-flows.",
+          "type": "string"
         }
       }
     },

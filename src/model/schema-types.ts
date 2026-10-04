@@ -173,6 +173,10 @@ export interface Ui {
    * Breadcrumb button label for leaving to a level. {title} is that level.
    */
   exit?: string;
+  /**
+   * Accessible name of the breadcrumb shown inside sub-flows.
+   */
+  breadcrumb?: string;
 }
 export interface Lens {
   id: Id;

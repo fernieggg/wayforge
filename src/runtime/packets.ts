@@ -1,4 +1,5 @@
-import type { RuntimeData, RuntimeScene } from '../render/runtimeData';
+import { pid } from '../model/ids';
+import type { RuntimeFlow, RuntimeScene } from '../render/runtimeData';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -11,7 +12,7 @@ interface Packet {
 }
 
 /** Opacity of one packet part. Part 0 is the glow; parts 1..tail are the head and its fading tail. */
-export function partOpacity(i: number, s: number, len: number, p: RuntimeData['packet'], dim: boolean, dimFactor: number): number {
+export function partOpacity(i: number, s: number, len: number, p: RuntimeFlow['packet'], dim: boolean, dimFactor: number): number {
   if (s < 0 || s > len) return 0;
   const fade = Math.min(1, s / p.fade, (len - s) / p.fade);
   const o = (i === 0 ? p.glowOpacity : 1 - (i - 1) / p.tail) * fade * (dim ? dimFactor : 1);
@@ -19,15 +20,16 @@ export function partOpacity(i: number, s: number, len: number, p: RuntimeData['p
 }
 
 /** Distance of the head along the route at a given time, in map units. */
-export function headDistance(nowMs: number, len: number, phase: number, p: RuntimeData['packet'], reduce: boolean): number {
+export function headDistance(nowMs: number, len: number, phase: number, p: RuntimeFlow['packet'], reduce: boolean): number {
   const travel = len / p.speed;
   const cycle = travel + p.hold;
   const u = reduce ? travel * p.reducedMotionAt : (nowMs / 1000 + phase) % cycle;
   return u * p.speed;
 }
 
-export function createPackets(layer: SVGGElement, data: RuntimeData, reduce: boolean) {
-  const p = data.packet;
+export function createPackets(layer: SVGGElement, flow: Pick<RuntimeFlow, 'packet' | 'dim' | 'prefix'>, reduce: boolean) {
+  const p = flow.packet;
+  const glow = `url(#${pid(flow.prefix, 'glow')})`;
   let packets: Packet[] = [];
 
   const circle = (attrs: Record<string, string | number>, parent: Element) => {
@@ -51,22 +53,26 @@ export function createPackets(layer: SVGGElement, data: RuntimeData, reduce: boo
       layer.textContent = '';
       packets = scene.routes.map((r) => {
         const segs = r.edges.map((id) => {
-          const path = document.getElementById('e-' + id) as unknown as SVGPathElement;
+          const path = document.getElementById(pid(flow.prefix, 'e-' + id)) as unknown as SVGPathElement;
           return { path, len: path.getTotalLength() };
         });
         const g = document.createElementNS(NS, 'g');
         layer.appendChild(g);
-        const parts = [circle({ r: p.glowRadius, class: 'pk-glow', filter: 'url(#glow)' }, g)];
+        const parts = [circle({ r: p.glowRadius, class: 'pk-glow', filter: glow }, g)];
         for (let i = 0; i < p.tail; i++) parts.push(circle({ r: Math.max(p.minRadius, p.headRadius - i * p.radiusStep), class: 'pk' }, g));
         return { segs, len: segs.reduce((a, s) => a + s.len, 0), phase: r.phase, dim: r.dim, parts };
       });
+    },
+    clear() {
+      layer.textContent = '';
+      packets = [];
     },
     draw(now: number) {
       for (const pk of packets) {
         const head = headDistance(now, pk.len, pk.phase, p, reduce);
         pk.parts.forEach((el, i) => {
           const s = i === 0 ? head : head - (i - 1) * p.gap;
-          const o = partOpacity(i, s, pk.len, p, pk.dim, data.dim);
+          const o = partOpacity(i, s, pk.len, p, pk.dim, flow.dim);
           if (s < 0 || s > pk.len) {
             el.style.opacity = '0';
             return;

@@ -20,6 +20,7 @@ export const DEFAULT_UI: Required<Ui> = {
   step: 'Step {n}: {label}',
   open: 'Open {title}',
   exit: 'Back to {title}',
+  breadcrumb: 'Where you are',
 };
 
 const zoomOf = (z: { journey: string; label?: string; badge?: boolean } | undefined) =>

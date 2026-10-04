@@ -71,3 +71,21 @@ export function zoomFrame(a: readonly number[], b: readonly number[], e: number)
   const cy = a[1]! + a[3]! / 2 + (b[1]! + b[3]! / 2 - (a[1]! + a[3]! / 2)) * f;
   return [cx - w / 2, cy - h / 2, w, h];
 }
+
+/** What placing a flow needs: its parent, its fit inside the owner, and the owner's per-lens offsets. */
+export interface Placement {
+  parent: number | null;
+  fit?: Transform;
+  ownerOffsetByLens?: Record<string, readonly number[]>;
+}
+
+/**
+ * Root-coordinate transform of flow `i`: the parent's transform, then the owner's offset in the
+ * parent's current lens (owners can glide per lens), then the fit inside the owner.
+ */
+export function absoluteTransform(flows: readonly Placement[], i: number, lensOf: (flow: number) => string): Transform {
+  const f = flows[i];
+  if (!f || f.parent === null || !f.fit) return IDENTITY;
+  const [dx, dy] = f.ownerOffsetByLens?.[lensOf(f.parent)] ?? [0, 0];
+  return compose(absoluteTransform(flows, f.parent, lensOf), compose(translate(dx!, dy!), f.fit));
+}

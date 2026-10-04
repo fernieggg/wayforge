@@ -61,6 +61,13 @@ footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px 40px;align
 .dots{display:flex;gap:8px;align-items:center}
 .dot{width:22px;height:14px;padding:4px 0;border:0;border-radius:7px;cursor:pointer;background-color:var(--node-line);background-clip:content-box;transition:width .3s,background-color .3s}
 .dot[aria-current="true"]{width:40px;background-color:${accent}}
+[hidden]{display:none !important}
+.crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;font:400 13px ${heading};letter-spacing:.02em;color:var(--muted)}
+.crumbs button{font:inherit;letter-spacing:inherit;color:inherit;background:none;border:0;padding:2px 0;cursor:pointer}
+.crumbs button:hover{color:var(--ink)}
+.crumbs button:focus-visible{outline:2px solid ${accent};outline-offset:2px}
+.crumbs [aria-current]{color:var(--ink)}
+.crumbs .sep{opacity:.6}
 @media (max-width:900px){.brand{display:none}header{justify-content:space-between}}
 @media (max-width:760px){header{padding:10px 16px 0}.hint{display:none}.lens-btn{padding:8px 14px}footer{grid-template-columns:1fr;padding:16px 16px 18px}.nav{flex-direction:row;align-items:center;justify-content:space-between;width:100%}}
 @media (max-height:520px){footer{padding:10px 20px 12px;gap:12px 24px}#ct{font-size:18px;margin-bottom:4px}#cx{font-size:14px;line-height:1.35}}`;
@@ -140,11 +147,69 @@ function mapCss(r: ResolvedJourney): string {
     `.edge.hid{stroke:none !important}`,
     `.edge.dash{stroke-dasharray:${m.edge.dash.join(' ')}}`,
     `.pk,.pk-glow{fill:var(--packet)}`,
-    `@media (prefers-reduced-motion: reduce){#cap,.node,.edge,.lab,.decor,.dot{transition:none}}`,
   );
   return out.join('\n');
 }
 
-export function buildCss(r: ResolvedJourney): string {
-  return [rootVars(r.theme), chromeCss(r.theme), mapCss(r)].join('\n');
+/** Zoomable elements: pointer, focus ring, and the marker in the owner's tone. */
+function zoomCss(r: ResolvedJourney): string {
+  const out = [
+    '.zoomable{cursor:pointer}',
+    '.zoomable:focus{outline:none}',
+    '.zoom-badge{transition:transform .2s;transform-box:fill-box;transform-origin:center}',
+    '.zoomable:hover .zoom-badge,.zoomable:focus-visible .zoom-badge{transform:scale(1.2)}',
+    '.zoom-badge path{fill:none;stroke:var(--btn-ink);stroke-width:2;stroke-linecap:round}',
+  ];
+  for (const [name, tone] of Object.entries(r.theme.tones))
+    if (tone) out.push(`.node .zoom-badge circle.zb.zt-${name},.decor .zoom-badge circle.zb.zt-${name}{fill:${v(tone.color)};stroke:none}`);
+  out.push('.zoomable:focus-visible .zoom-badge circle.zb{stroke:var(--ink);stroke-width:2}');
+  return out.join('\n');
+}
+
+/**
+ * Prefixes every rule with a flow's scope class. Each selector gains exactly one class,
+ * so the cascade inside a flow resolves as before. Lens and layer state classes sit on
+ * the flow group itself, so those selectors attach to the scope instead of nesting under it.
+ */
+export function scopeRules(css: string, scope: string): string {
+  return css
+    .split('\n')
+    .map((rule) => {
+      const brace = rule.indexOf('{');
+      if (brace < 0 || rule.startsWith('@')) return rule;
+      const selectors = rule
+        .slice(0, brace)
+        .split(',')
+        .map((sel) => sel.trim())
+        .map((sel) => (STATE.test(sel) ? `${scope}${sel}` : `${scope} ${sel}`));
+      return selectors.join(',') + rule.slice(brace);
+    })
+    .join('\n');
+}
+
+const STATE = new RegExp('^[.](lens|lyon)-[A-Za-z0-9_-]+ ');
+
+/** Sub-flows may use another theme; their colors are scoped to their group. */
+function flowVars(theme: Theme, scope: string): string {
+  const dark = palette(theme.colors.dark);
+  return [
+    `${scope}{${palette(theme.colors.light)}}`,
+    `@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) ${scope}{${dark}}}`,
+    `:root[data-theme="dark"] ${scope}{${dark}}`,
+  ].join('\n');
+}
+
+/** Page chrome from the root flow's theme; map styles per flow, each under its own scope. */
+export function buildCss(flows: readonly { resolved: ResolvedJourney }[]): string {
+  const root = flows[0]!.resolved;
+  const parts = [rootVars(root.theme), chromeCss(root.theme)];
+  const motionOff = ['#cap', '.dot'];
+  flows.forEach((f, i) => {
+    const scope = `.wf-f${i}`;
+    if (i > 0) parts.push(flowVars(f.resolved.theme, scope));
+    parts.push(scopeRules(mapCss(f.resolved), scope), scopeRules(zoomCss(f.resolved), scope));
+    motionOff.push(...['.node', '.edge', '.lab', '.decor'].map((sel) => `${scope} ${sel}`));
+  });
+  parts.push(`@media (prefers-reduced-motion: reduce){${motionOff.join(',')}{transition:none}}`);
+  return parts.join('\n');
 }
