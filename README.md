@@ -130,13 +130,35 @@ The rules that matter most:
 
 `wayforge validate` rejects broken references and their paths, for example `scenes.both[3].routes[1].edges[2]: unknown edge "thru_bk" (scene "gate")`. It also warns about likely mistakes: text too small to read for the camera, packets jumping between edges outside a node, rows overflowing a container.
 
+## Zooming into sub-flows
+
+Any node or panel can open another journey file, a **sub-flow**. During the presentation the camera flies into the element, the element dissolves into the sub-flow's own map, and the sub-flow plays with its own scenes, lenses and packets. Zooming out lands back in the parent.
+
+```jsonc
+// in the parent journey
+{ "id": "queue", "kind": "container", "...": "...",
+  "zoom": { "journey": "./support-queue.json", "label": "Support queue" } }
+
+// a parent scene that dives in when the presenter presses Next
+{ "key": "work", "...": "...", "enter": "queue" }
+```
+
+- **Two ways in.** A scene with `"enter"` dives in on Next. Any zoomable element can also be clicked, or focused and opened with Enter, at any time. Zoomable elements show a small "+" marker; `"badge": false` hides it.
+- **Ways out.** Next on the sub-flow's last scene zooms out and continues the parent tour. Back on its first scene returns to the scene that entered it. Escape, or a breadcrumb in the header, exits one level or several.
+- **Lenses.** A sub-flow keeps its own lenses. It opens in the lens with the same id as the parent's current lens, or else its own default. While inside, the lens buttons, step dots and number keys belong to the sub-flow.
+- **Files.** The `journey` path is relative to the referencing file. A sub-flow is an ordinary journey: it builds on its own, can be opened from several places, and can contain zoomable elements of its own. `wayforge build` bundles the whole tree into one page.
+- **Theme.** The page chrome (background, header, footer) uses the root journey's theme. Each sub-flow's map uses its own theme and overrides.
+- **Validation.** `validate` checks every file in the tree and prefixes sub-flow problems with where they come from, for example `support-queue.json (via nodes[7](queue).zoom) › scenes.team[1]…`. It rejects missing files, zoom cycles, an `enter` that names something without a zoom, and empty sub-flows. It warns when the entering scene's camera doesn't contain the element.
+
+See `journeys/examples/support-ticket.json` (tour entry into `support-queue.json`, and click-only entry into `knowledge-base.json`).
+
 ## Commands
 
 ```bash
 wayforge validate <journey.json> [--strict]                 # schema, integrity and lint checks
 wayforge build    <journey.json> [-o out.html] [--strict]   # one self-contained HTML file (default dist/<name>.html)
 wayforge dev      <journey.json> [--port 5173]              # serve, rebuild and reload on save
-wayforge snapshot <journey.json> [--lens id] [--theme light|dark] [-o dir]   # PNG of every scene
+wayforge snapshot <journey.json> [--lens id] [--theme light|dark] [-o dir]   # PNG of every step of the tour, sub-flows included
 npm test                                                     # unit, validation and output-constraint tests
 npm run test:parity                                          # Playwright parity against the reference (skips if absent)
 npm run parity:report                                        # readable structural diff, scene by scene

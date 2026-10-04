@@ -124,6 +124,15 @@ Each lens has its own ordered scene list. A scene has:
 
 Colors are CSS variables: `--bg --ink --muted --node --node-line --panel --sys --deep --deep-soft --packet --glass --btn-ink --grid --glow --bk --nur --panel-bk --panel-nur --wk --wk-soft`. The light set is the default; the dark set applies under `prefers-color-scheme: dark` (unless `data-theme="light"`) and under `data-theme="dark"`. Both themes were designed deliberately; check both. The packet color (gold) is reserved for packets only.
 
+### Sub-flows (zoom)
+
+- A node or panel with `zoom: { journey }` opens another journey file. `src/model/tree.ts` loads the tree. Each reference is its own flow instance with an id prefix (`""` for the root, `z1`, `z2`...), validated with the normal pipeline. A reference back to an ancestor is an error.
+- All flows live in one SVG as **sibling** groups (`[data-flow]`), never nested, so scoped descendant selectors cannot leak between flows. Map CSS is scoped per flow under `.wf-f<i>`. Every rule gains exactly one class, which preserves the cascade inside a flow; lens and layer state classes sit on the flow group itself.
+- A sub-flow is placed by `fitTransform` (uniform, centered, 6% padding) inside its owner's box. Its root-coordinate transform is composed at entry from the parent's transform, the owner's offset in the parent's current lens, and the fit (`absoluteTransform` in `src/geometry/zoom.ts`). Cameras of a sub-flow are its own cameras mapped through that transform. The camera is still only the viewBox.
+- The zoom is one flight (`motion.zoom`, 1.6 s). Size interpolates geometrically, and the center follows the size change so the destination stays in view (`zoomFrame`). The two maps cross-fade, staggered, in the middle of the flight. Reduced motion swaps instantly. The existing `fly` tween is untouched, which keeps parity.
+- Root ids stay unprefixed and the root keeps its original structure, so dataset #1 parity is unaffected. Parity must stay exact after any zoom change.
+- `goToScene(..., 'dots')` in `src/cli/drive.ts` jumps by step dot. Use it in tests: stepping with the arrow key through a scene with `enter` zooms in.
+
 ### Interaction
 
 Back and Next buttons, one dot per scene, arrow keys, Page Up/Down, space, Home and End, `1 2 3` to select lens (in the order defined by the journey's lenses), `F` for full screen (hidden if unavailable), and swipe left or right on touch.
