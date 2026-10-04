@@ -35,10 +35,18 @@ export async function openPage(browser: Browser, url: string, o: DriveOptions): 
   return page;
 }
 
-/** Selects a lens (by its number key) and a step, as a presenter would, then lets everything settle. */
-export async function goToScene(page: Page, lensKey: string, step: number) {
+/**
+ * Selects a lens (by its number key) and a step, then lets everything settle. `keys` steps with the
+ * arrow key as a presenter would; `dots` clicks the step dot, which never zooms into a sub-flow on the way.
+ */
+export async function goToScene(page: Page, lensKey: string, step: number, via: 'keys' | 'dots' = 'keys') {
   await page.keyboard.press(lensKey);
   await page.clock.runFor(2000);
+  if (via === 'dots') {
+    await page.locator('.dot').nth(step).dispatchEvent('click');
+    await page.clock.runFor(2000);
+    return;
+  }
   await page.keyboard.press('Home');
   await page.clock.runFor(2000);
   for (let i = 0; i < step; i++) {

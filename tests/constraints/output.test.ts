@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { buildHtml } from '../../src/render/html';
 import { runtimeBundle } from '../../src/render/runtimeBundle';
-import { validateFile } from '../../src/validate';
+import { loadTree } from '../../src/model/tree';
 import { LEAD_JOURNEY } from '../private';
 
 const ROOT = resolve(__dirname, '../..');
@@ -19,9 +19,9 @@ const FORBIDDEN_APIS = [
 describe.each(JOURNEYS)('built output of %s', (journey) => {
   let html = '';
   beforeAll(async () => {
-    const { resolved, issues } = validateFile(journey);
+    const { flows, issues } = loadTree(journey);
     expect(issues.filter((i) => i.level === 'error')).toEqual([]);
-    html = buildHtml(resolved!, await runtimeBundle());
+    html = buildHtml(flows!, await runtimeBundle());
   });
 
   it('is one file under 16 MB', () => {

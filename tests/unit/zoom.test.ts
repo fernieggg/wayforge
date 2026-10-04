@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compose, fitTransform, flowBounds, IDENTITY, toAbsoluteCamera, translate, zoomFrame } from '../../src/geometry/zoom';
+import { absoluteTransform, compose, fitTransform, flowBounds, IDENTITY, toAbsoluteCamera, translate, zoomFrame } from '../../src/geometry/zoom';
 import type { ResolvedNode } from '../../src/model/types';
 
 const node = (at: [number, number], size: [number, number], offsetByLens: Record<string, [number, number]> = {}) =>
@@ -62,5 +62,25 @@ describe('zoomFrame', () => {
       expect(x + w).toBeGreaterThanOrEqual(b[0]! + b[2]! - 1e-6);
       expect(y + h).toBeGreaterThanOrEqual(b[1]! + b[3]! - 1e-6);
     }
+  });
+});
+
+describe('absoluteTransform', () => {
+  const fitA = { s: 0.5, tx: 100, ty: 100 };
+  const fitB = { s: 0.1, tx: 10, ty: 20 };
+  const flows = [
+    { parent: null },
+    { parent: 0, fit: fitA, ownerOffsetByLens: { moved: [0, 40] } },
+    { parent: 1, fit: fitB },
+  ];
+  it('is the identity for the root', () => {
+    expect(absoluteTransform(flows, 0, () => 'any')).toEqual(IDENTITY);
+  });
+  it('follows the owner when the parent lens moves it', () => {
+    expect(absoluteTransform(flows, 1, () => 'still')).toEqual(fitA);
+    expect(absoluteTransform(flows, 1, () => 'moved')).toEqual({ s: 0.5, tx: 100, ty: 140 });
+  });
+  it('chains through nested sub-flows', () => {
+    expect(absoluteTransform(flows, 2, () => 'moved')).toEqual(compose({ s: 0.5, tx: 100, ty: 140 }, fitB));
   });
 });

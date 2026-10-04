@@ -3,7 +3,7 @@ import { basename, dirname, extname, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { buildHtml } from '../render/html';
 import { runtimeBundle } from '../render/runtimeBundle';
-import { validateFile } from '../validate';
+import { loadTree } from '../model/tree';
 import { report } from './validate';
 
 export const MAX_BYTES = 16 * 1024 * 1024;
@@ -12,11 +12,11 @@ export function defaultOut(file: string): string {
   return resolve('dist', basename(file, extname(file)) + '.html');
 }
 
-/** Validates and builds; returns the HTML, or null when validation fails. */
+/** Validates the journey and its sub-flows and builds them into one page; null when validation fails. */
 export async function buildFile(file: string, strict = false): Promise<string | null> {
-  const result = validateFile(file);
-  if (!report(file, result, strict) || !result.resolved) return null;
-  return buildHtml(result.resolved, await runtimeBundle());
+  const result = loadTree(file);
+  if (!report(file, result, strict) || !result.flows) return null;
+  return buildHtml(result.flows, await runtimeBundle());
 }
 
 export async function runBuild(args: string[]): Promise<number> {

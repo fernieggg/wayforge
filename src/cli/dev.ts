@@ -7,7 +7,8 @@ import type { Journey } from '../model/types';
 import { buildHtml } from '../render/html';
 import { esc } from '../render/escape';
 import { runtimeBundle } from '../render/runtimeBundle';
-import { formatIssue, validateFile } from '../validate';
+import { loadTree } from '../model/tree';
+import { formatIssue } from '../validate';
 
 // Dev-only: reloads the page when the server announces a rebuild. Never part of a built file.
 const RELOAD = `<script>new EventSource('/__wayforge').onmessage=function(){location.reload()}</script>`;
@@ -31,31 +32,36 @@ export async function runDev(args: string[]): Promise<number> {
   const clients = new Set<ServerResponse>();
 
   async function rebuild() {
-    const result = validateFile(journeyFile);
+    const result = loadTree(journeyFile);
     const errors = result.issues.filter((i) => i.level === 'error');
     for (const i of result.issues) process.stderr.write(formatIssue(i) + '\n');
-    if (!result.resolved) {
+    if (result.flows) files = result.flows.map((f) => f.file);
+    if (!result.flows) {
       page = errorPage(file!, errors.map(formatIssue));
       process.stderr.write(`${file}: ${errors.length} error(s), serving the error list\n`);
     } else {
-      page = buildHtml(result.resolved, await runtimeBundle()).replace('</body>', `${RELOAD}\n</body>`);
+      page = buildHtml(result.flows, await runtimeBundle()).replace('</body>', `${RELOAD}\n</body>`);
       process.stderr.write(`${file}: rebuilt\n`);
     }
     for (const c of clients) c.write('data: reload\n\n');
   }
 
-  // Watch the journey and its theme file; re-resolve the theme path on each rebuild in case it changed.
+  // Watch every journey in the tree (the root and its sub-flows) and their theme files. The list is
+  // refreshed after each successful build, since sub-flow references can change.
+  let files = [journeyFile];
   let watchers: FSWatcher[] = [];
   let timer: NodeJS.Timeout | undefined;
   const rewatch = () => {
     watchers.forEach((w) => w.close());
-    let theme: string | undefined;
-    try {
-      theme = (readJson(journeyFile) as Partial<Journey>).theme;
-    } catch {
-      theme = undefined;
-    }
-    watchers = [journeyFile, themePath(theme, journeyFile)].map((f) => {
+    const themeOf = (f: string) => {
+      try {
+        return themePath((readJson(f) as Partial<Journey>).theme, f);
+      } catch {
+        return null;
+      }
+    };
+    const targets = [...new Set([...files, ...files.map(themeOf).filter((t): t is string => t !== null)])];
+    watchers = targets.map((f) => {
       try {
         return watch(f, () => {
           clearTimeout(timer);
