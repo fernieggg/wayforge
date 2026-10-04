@@ -33,6 +33,8 @@ npx wayforge dev      journeys/examples/support-ticket.json     # http://localho
 
 Open the built file in any browser. It is one self-contained page.
 
+**Writing your own journey:** read [docs/authoring.md](docs/authoring.md), the complete guide: workflow, every field, colors, layout with concrete numbers, scenes, sub-flows, and what every validation message means. To have an LLM write one, give it [docs/llm-authoring.md](docs/llm-authoring.md).
+
 ## Where things stand today
 
 v1 parity is in place. The engine reads a journey JSON file, validates it, and builds one self-contained page. Built from dataset #1, that page matches the hand-built reference page in every scene of every lens, in light and dark mode, with and without reduced motion. The Playwright parity tests check this structurally (every element's computed look, the camera, the caption and the packet positions) and with screenshots. A second, unrelated journey (`journeys/examples/support-ticket.json`) builds with no engine changes.
@@ -70,9 +72,9 @@ The reference file is the **golden master**. Do not edit it. Treat its rendered 
 
 ## Journey format
 
-A journey is one JSON file, validated against [`schema/journey.schema.json`](schema/journey.schema.json). Point your editor at it with `"$schema"` to get completion and inline docs. The look comes from a theme ([`themes/default.json`](themes/default.json), validated by [`schema/theme.schema.json`](schema/theme.schema.json)), which a journey picks with `"theme"` and can adjust with `"themeOverrides"`.
+The full reference is [docs/authoring.md](docs/authoring.md); this is the short version. A journey is one JSON file, validated against [`schema/journey.schema.json`](schema/journey.schema.json). Point your editor at it with `"$schema"` to get completion and inline docs. The look comes from a theme ([`themes/default.json`](themes/default.json), validated by [`schema/theme.schema.json`](schema/theme.schema.json)), which a journey picks with `"theme"` and can adjust with `"themeOverrides"`.
 
-```jsonc
+```json
 {
   "$schema": "../schema/journey.schema.json",
   "version": 1,
@@ -188,6 +190,7 @@ wayforge/
   schema/                       journey.schema.json, theme.schema.json (published)
   themes/default.json           design tokens of the reference look
   journeys/examples/            generic example journeys
+  docs/                         authoring.md (complete guide), llm-authoring.md (brief for an LLM)
   src/
     model/       loading, defaults, group expansion, lens visibility, generated schema types
     geometry/    pure layout math: shapes, text and pill placement, path parsing

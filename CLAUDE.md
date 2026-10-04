@@ -193,6 +193,10 @@ A change is done only when all of these hold:
 4. **Constraints.** The output passes every check in "Output and hosting constraints." Add an automated test that scans the built file for external URLs and forbidden APIs.
 5. `npm test` passes.
 
+## Authoring docs
+
+`docs/authoring.md` (for people) and `docs/llm-authoring.md` (for an LLM) must stay complete and correct. Any change to the schema, the theme, defaults, layout math, validation rules or interaction updates them in the same change. Every ```json block in `README.md` and `docs/` is parsed by `tests/validate/docs.test.ts`, and each complete journey among them must validate with no errors or warnings. Fence fragments as ```jsonc.
+
 ## Authoring rules for journey data
 
 - **Never invent facts.** Only put in the data what the author has stated. If a connection or system is unknown, leave it as a plain arrow or omit it, and add a note. Do not guess recipe names, system roles or routes.
