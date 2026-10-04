@@ -1,4 +1,5 @@
 import type { Browser, Page } from '@playwright/test';
+import { goToScene, openPage } from '../../src/cli/drive';
 
 export interface Target {
   lensKey: string;
@@ -14,45 +15,13 @@ export interface Options {
   keepTransitions?: boolean;
 }
 
-const START = new Date('2026-01-01T00:00:00Z');
-
-/**
- * Opens a page with a frozen clock and no web fonts, so two pages driven the same
- * way render identical frames. CSS transitions are switched off because they run on
- * the real compositor clock; their declared durations are compared structurally.
- */
-export async function open(browser: Browser, url: string, o: Options): Promise<Page> {
-  const ctx = await browser.newContext({
-    viewport: { width: o.width ?? 1440, height: o.height ?? 900 },
-    colorScheme: o.scheme,
-    reducedMotion: o.reducedMotion ? 'reduce' : 'no-preference',
-  });
-  // tsx/esbuild wraps functions passed to page.evaluate in a __name helper.
-  await ctx.addInitScript({ content: 'window.__name = (f) => f;' });
-  await ctx.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
-  const page = await ctx.newPage();
-  await page.clock.install({ time: START });
-  await page.clock.pauseAt(new Date(START.getTime() + 1000));
-  await page.goto(url);
-  if (!o.keepTransitions) await page.addStyleTag({ content: '*,*::before,*::after{transition-duration:0s !important;transition-delay:0s !important}' });
-  // Navigation replays the clock setup with a few real milliseconds of drift; re-pausing
-  // at one absolute time realigns the pages' clocks and animation frames.
-  await page.clock.pauseAt(new Date(START.getTime() + 10_000));
-  await page.clock.runFor(100);
-  return page;
+/** Fonts blocked and transitions frozen, so two pages driven the same way render identical frames. */
+export function open(browser: Browser, url: string, o: Options): Promise<Page> {
+  return openPage(browser, url, { ...o, blockFonts: true, freezeTransitions: !o.keepTransitions });
 }
 
-/** Selects a lens and step by keyboard, exactly as a presenter would, then lets the camera settle. */
-export async function goTo(page: Page, t: Target) {
-  await page.keyboard.press(t.lensKey);
-  await page.clock.runFor(2000);
-  await page.keyboard.press('Home');
-  await page.clock.runFor(2000);
-  for (let i = 0; i < t.steps; i++) {
-    await page.keyboard.press('ArrowRight');
-    await page.clock.runFor(100);
-  }
-  await page.clock.runFor(2000);
+export function goTo(page: Page, t: Target) {
+  return goToScene(page, t.lensKey, t.steps);
 }
 
 /** A comparable description of everything visible: camera, caption, nav, and every map element's computed look. */
