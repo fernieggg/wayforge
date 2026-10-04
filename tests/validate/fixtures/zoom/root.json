@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "meta": {
+    "title": "Root"
+  },
+  "lenses": [
+    {
+      "id": "main",
+      "label": "Main"
+    }
+  ],
+  "stageOrder": [
+    "start",
+    "inside"
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "kind": "box",
+      "at": [
+        0,
+        100
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "title": "A"
+    },
+    {
+      "id": "b",
+      "kind": "box",
+      "at": [
+        300,
+        100
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "title": "B",
+      "zoom": {
+        "journey": "./child.json"
+      }
+    }
+  ],
+  "edges": [],
+  "scenes": {
+    "main": [
+      {
+        "key": "start",
+        "label": "Start",
+        "title": "Root",
+        "caption": "Root.",
+        "camera": [
+          0,
+          0,
+          800,
+          400
+        ],
+        "active": {
+          "nodes": [
+            "a",
+            "b"
+          ]
+        },
+        "enter": "b"
+      }
+    ]
+  }
+}

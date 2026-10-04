@@ -59,6 +59,14 @@ export function lint(r: ResolvedJourney): Issue[] {
         }
       });
 
+      if (s.enter !== undefined) {
+        const n = nodeById.get(s.enter);
+        const box = n ? nodeBox(n, lens.id) : r.panels.find((p) => p.id === s.enter)?.rect;
+        const [cx, cy, cw, ch] = s.camera;
+        if (box && (box[0] < cx || box[1] < cy || box[0] + box[2] > cx + cw || box[1] + box[3] > cy + ch))
+          warn('enter-off-camera', `${at}.enter`, `"${s.enter}" is not fully inside this scene's camera, so the zoom starts from off screen${ctx}`);
+      }
+
       s.effects.forEach((fx, k) => {
         const n = nodeById.get(fx.node);
         if (fx.type === 'cycleRows' && n && !theme.tones[n.tone]?.soft)
@@ -77,6 +85,13 @@ export function lint(r: ResolvedJourney): Issue[] {
     if (n.subtitle !== undefined) warn('container-subtitle', `nodes[${i}](${n.id}).subtitle`, 'containers do not show a subtitle');
     if (n.rowStyle === 'tint' && !theme.tones[n.tone]?.soft)
       warn('tone-without-soft', `nodes[${i}](${n.id}).rowStyle`, `tone "${n.tone}" has no soft color for tinted rows`);
+  });
+
+  r.nodes.forEach((n, i) => {
+    if (n.zoom && n.lenses.length === 0) warn('zoom-unreachable', `nodes[${i}](${n.id}).zoom`, 'this node is parked in every lens, so its sub-flow can never be opened');
+  });
+  r.panels.forEach((p, i) => {
+    if (p.zoom && p.lenses.length === 0) warn('zoom-unreachable', `panels[${i}](${p.id}).zoom`, 'this panel is parked in every lens, so its sub-flow can never be opened');
   });
 
   r.labels.forEach((l, i) => {

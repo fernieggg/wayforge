@@ -190,6 +190,13 @@ export function checkIntegrity(j: Journey, theme: Theme): Issue[] {
         }),
       );
 
+      if (s.enter !== undefined) {
+        const owner = nodeIds.get(s.enter) ?? (j.panels ?? []).find((p) => p.id === s.enter);
+        if (!owner) err('unknown-enter', `${at}.enter`, `unknown node or panel "${s.enter}"${ctx}`);
+        else if (!owner.zoom) err('enter-not-zoomable', `${at}.enter`, `"${s.enter}" has no zoom, so there is nothing to enter${ctx}`);
+        else if (!visibleIn(owner.lenses, lens.id)) err('enter-not-in-lens', `${at}.enter`, `"${s.enter}" is not visible in lens "${lens.id}"${ctx}`);
+      }
+
       (s.effects ?? []).forEach((fx, k) => {
         const path = `${at}.effects[${k}]`;
         const node = nodeIds.get(fx.node);

@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "meta": {
+    "title": "Missing"
+  },
+  "lenses": [
+    {
+      "id": "main",
+      "label": "Main"
+    }
+  ],
+  "stageOrder": [
+    "start",
+    "inside"
+  ],
+  "nodes": [
+    {
+      "id": "x",
+      "kind": "box",
+      "at": [
+        0,
+        100
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "title": "X",
+      "zoom": {
+        "journey": "./nowhere.json"
+      }
+    }
+  ],
+  "edges": [],
+  "scenes": {
+    "main": [
+      {
+        "key": "start",
+        "label": "Start",
+        "title": "Missing",
+        "caption": "Missing.",
+        "camera": [
+          0,
+          0,
+          800,
+          400
+        ],
+        "active": {
+          "nodes": [
+            "x"
+          ]
+        }
+      }
+    ]
+  }
+}

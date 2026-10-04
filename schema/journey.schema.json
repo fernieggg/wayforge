@@ -244,6 +244,14 @@
         },
         "step": {
           "type": "string"
+        },
+        "open": {
+          "description": "Accessible name of a zoomable element. {title} is the sub-flow name.",
+          "type": "string"
+        },
+        "exit": {
+          "description": "Breadcrumb button label for leaving to a level. {title} is that level.",
+          "type": "string"
         }
       }
     },
@@ -338,6 +346,9 @@
         },
         "notes": {
           "$ref": "#/$defs/notes"
+        },
+        "zoom": {
+          "$ref": "#/$defs/zoom"
         }
       }
     },
@@ -537,6 +548,9 @@
         },
         "notes": {
           "$ref": "#/$defs/notes"
+        },
+        "zoom": {
+          "$ref": "#/$defs/zoom"
         }
       }
     },
@@ -776,6 +790,38 @@
           "description": "An establishing shot. Exempt from the readability lint.",
           "type": "boolean",
           "default": false
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        },
+        "enter": {
+          "description": "A zoomable node or panel. Pressing Next on this scene zooms into its sub-flow.",
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "zoom": {
+      "description": "Makes this element zoomable: it opens another journey (a sub-flow) that plays inside it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "journey"
+      ],
+      "properties": {
+        "journey": {
+          "description": "Path to the sub-flow journey file, relative to this file.",
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "description": "Breadcrumb name for the sub-flow. Defaults to its meta.title.",
+          "type": "string",
+          "minLength": 1
+        },
+        "badge": {
+          "description": "Show the small zoomable marker on the element.",
+          "type": "boolean",
+          "default": true
         },
         "notes": {
           "$ref": "#/$defs/notes"

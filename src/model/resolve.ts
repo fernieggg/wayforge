@@ -18,7 +18,12 @@ export const DEFAULT_UI: Required<Ui> = {
   lensGroup: 'Lens',
   steps: 'Journey steps',
   step: 'Step {n}: {label}',
+  open: 'Open {title}',
+  exit: 'Back to {title}',
 };
+
+const zoomOf = (z: { journey: string; label?: string; badge?: boolean } | undefined) =>
+  z ? { journey: z.journey, label: z.label, badge: z.badge ?? true } : undefined;
 
 export function pillWidth(text: string, theme: Theme): number {
   const p = theme.metrics.pill;
@@ -59,6 +64,7 @@ export function resolveJourney(j: Journey, theme: Theme): ResolvedJourney {
     lenses: n.lenses ?? allLenses,
     offsetByLens: (n.offsetByLens ?? {}) as Record<string, Vec>,
     metrics: n.metrics ?? {},
+    zoom: zoomOf(n.zoom),
   }));
 
   const edges: ResolvedEdge[] = j.edges.map((e) => ({
@@ -91,6 +97,7 @@ export function resolveJourney(j: Journey, theme: Theme): ResolvedJourney {
     layer: p.layer,
     lenses: p.lenses ?? allLenses,
     title: p.title,
+    zoom: zoomOf(p.zoom),
   }));
 
   const scenes: Record<string, ResolvedScene[]> = {};
@@ -107,6 +114,7 @@ export function resolveJourney(j: Journey, theme: Theme): ResolvedJourney {
       edges: expandRefs(s.active.edges ?? [], groups),
       routes: (s.routes ?? []).map((r) => ({ edges: r.edges, phase: r.phase ?? 0, dim: r.dim ?? false })),
       effects: s.effects ?? [],
+      enter: s.enter,
     }));
   }
 

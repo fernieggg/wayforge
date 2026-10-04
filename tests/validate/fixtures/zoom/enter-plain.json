@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "meta": {
+    "title": "Enter plain"
+  },
+  "lenses": [
+    {
+      "id": "main",
+      "label": "Main"
+    }
+  ],
+  "stageOrder": [
+    "start",
+    "inside"
+  ],
+  "nodes": [
+    {
+      "id": "a",
+      "kind": "box",
+      "at": [
+        0,
+        100
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "title": "A"
+    }
+  ],
+  "edges": [],
+  "scenes": {
+    "main": [
+      {
+        "key": "start",
+        "label": "Start",
+        "title": "Enter plain",
+        "caption": "Enter plain.",
+        "camera": [
+          0,
+          0,
+          800,
+          400
+        ],
+        "active": {
+          "nodes": [
+            "a"
+          ]
+        },
+        "enter": "a"
+      }
+    ]
+  }
+}

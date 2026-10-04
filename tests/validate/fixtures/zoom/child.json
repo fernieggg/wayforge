@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "meta": {
+    "title": "Child"
+  },
+  "lenses": [
+    {
+      "id": "main",
+      "label": "Main"
+    }
+  ],
+  "stageOrder": [
+    "start",
+    "inside"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "kind": "box",
+      "at": [
+        0,
+        100
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "title": "C",
+      "zoom": {
+        "journey": "./grandchild.json"
+      }
+    },
+    {
+      "id": "d",
+      "kind": "box",
+      "at": [
+        300,
+        100
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "title": "D"
+    }
+  ],
+  "edges": [],
+  "scenes": {
+    "main": [
+      {
+        "key": "start",
+        "label": "Start",
+        "title": "Child",
+        "caption": "Child.",
+        "camera": [
+          0,
+          0,
+          800,
+          400
+        ],
+        "active": {
+          "nodes": [
+            "c",
+            "d"
+          ]
+        }
+      }
+    ]
+  }
+}

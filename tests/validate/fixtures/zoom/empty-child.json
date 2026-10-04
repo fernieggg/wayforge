@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "meta": {
+    "title": "Empty"
+  },
+  "lenses": [
+    {
+      "id": "main",
+      "label": "Main"
+    }
+  ],
+  "stageOrder": [
+    "start",
+    "inside"
+  ],
+  "nodes": [],
+  "edges": [],
+  "scenes": {
+    "main": [
+      {
+        "key": "start",
+        "label": "Start",
+        "title": "Empty",
+        "caption": "Empty.",
+        "camera": [
+          0,
+          0,
+          800,
+          400
+        ],
+        "active": {}
+      }
+    ]
+  }
+}

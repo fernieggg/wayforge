@@ -165,6 +165,14 @@ export interface Ui {
   lensGroup?: string;
   steps?: string;
   step?: string;
+  /**
+   * Accessible name of a zoomable element. {title} is the sub-flow name.
+   */
+  open?: string;
+  /**
+   * Breadcrumb button label for leaving to a level. {title} is that level.
+   */
+  exit?: string;
 }
 export interface Lens {
   id: Id;
@@ -198,6 +206,25 @@ export interface Panel {
     at: Point;
   };
   notes?: Notes;
+  zoom?: Zoom;
+}
+/**
+ * Makes this element zoomable: it opens another journey (a sub-flow) that plays inside it.
+ */
+export interface Zoom {
+  /**
+   * Path to the sub-flow journey file, relative to this file.
+   */
+  journey: string;
+  /**
+   * Breadcrumb name for the sub-flow. Defaults to its meta.title.
+   */
+  label?: string;
+  /**
+   * Show the small zoomable marker on the element.
+   */
+  badge?: boolean;
+  notes?: Notes;
 }
 export interface Node {
   id: Id;
@@ -230,6 +257,7 @@ export interface Node {
   };
   metrics?: NodeMetrics;
   notes?: Notes;
+  zoom?: Zoom;
 }
 /**
  * A small label straddling the node's top edge, right-aligned. Names the platform or owner.
@@ -324,6 +352,10 @@ export interface Scene {
    */
   wide?: boolean;
   notes?: Notes;
+  /**
+   * A zoomable node or panel. Pressing Next on this scene zooms into its sub-flow.
+   */
+  enter?: string;
 }
 export interface Route {
   /**
@@ -496,6 +528,16 @@ export interface WayforgeTheme {
       panelTitle: number;
       pill: number;
     };
+    /**
+     * The zoomable marker. Optional; defaults to radius 11, inset 16.
+     */
+    zoomBadge?: {
+      radius: number;
+      /**
+       * Distance of the marker center from the bottom-right corner.
+       */
+      inset: number;
+    };
   };
   /**
    * Durations in seconds unless noted.
@@ -539,6 +581,10 @@ export interface WayforgeTheme {
      * Minimum horizontal swipe in CSS pixels.
      */
     swipe: number;
+    /**
+     * Zoom flight into or out of a sub-flow. Optional; defaults to 1.6.
+     */
+    zoom?: number;
   };
   packet: {
     /**

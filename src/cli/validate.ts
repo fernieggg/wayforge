@@ -1,8 +1,9 @@
 import { parseArgs } from 'node:util';
 import type { Issue } from '../model/types';
-import { formatIssue, validateFile, type Result } from '../validate';
+import { loadTree } from '../model/tree';
+import { formatIssue } from '../validate';
 
-export function report(file: string, result: Result, strict: boolean): boolean {
+export function report(file: string, result: { issues: Issue[] }, strict: boolean): boolean {
   const issues: Issue[] = strict ? result.issues.map((i) => ({ ...i, level: 'error' })) : result.issues;
   for (const i of issues) process.stderr.write(formatIssue(i) + '\n');
   const errors = issues.filter((i) => i.level === 'error').length;
@@ -19,5 +20,5 @@ export function runValidate(args: string[]): number {
     process.stderr.write('usage: wayforge validate <journey.json> [--strict]\n');
     return 2;
   }
-  return report(file, validateFile(file), values.strict ?? false) ? 0 : 1;
+  return report(file, loadTree(file), values.strict ?? false) ? 0 : 1;
 }

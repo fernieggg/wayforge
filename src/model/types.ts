@@ -31,6 +31,12 @@ export interface ResolvedRow {
   text: string;
 }
 
+export interface ResolvedZoom {
+  journey: string;
+  label?: string;
+  badge: boolean;
+}
+
 export interface ResolvedNode {
   id: string;
   kind: NodeKind;
@@ -47,6 +53,7 @@ export interface ResolvedNode {
   lenses: string[];
   offsetByLens: Record<string, Vec>;
   metrics: NodeMetrics;
+  zoom?: ResolvedZoom;
 }
 
 export interface ResolvedEdge {
@@ -75,6 +82,7 @@ export interface ResolvedPanel {
   layer?: string;
   lenses: string[];
   title?: { text: string; at: Vec };
+  zoom?: ResolvedZoom;
 }
 
 export interface ResolvedRoute {
@@ -95,6 +103,7 @@ export interface ResolvedScene {
   edges: string[];
   routes: ResolvedRoute[];
   effects: Effect[];
+  enter?: string;
 }
 
 export interface ResolvedLayer {
