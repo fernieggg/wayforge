@@ -176,7 +176,7 @@ tests/         unit, validate (fixtures and docs examples), constraints (built o
 
 ```bash
 npm test                  # unit, validation, docs-example and output-constraint tests
-npx playwright test       # end-to-end tests in a real browser (sub-flow zooming, navigation)
+npm run test:browser      # end-to-end and visual tests in a real browser (Playwright)
 npm run typecheck
 ```
 

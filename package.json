@@ -15,7 +15,7 @@
     "gen:types": "node scripts/gen-types.mjs",
     "typecheck": "tsc --noEmit",
     "test": "npm run build:runtime && vitest run",
-    "test:parity": "npm run build:runtime && playwright test",
+    "test:browser": "npm run build:runtime && playwright test",
     "wayforge": "tsx src/cli/index.ts",
     "parity:report": "tsx scripts/parity-report.ts"
   },
