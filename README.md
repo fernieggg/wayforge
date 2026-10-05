@@ -49,10 +49,10 @@ Edit the file and save: the page rebuilds and reloads on every save, and shows t
 **4. Build and share.**
 
 ```bash
-npx wayforge build journeys/local/coffee.json -o coffee.html
+npx wayforge build journeys/local/coffee.json
 ```
 
-`coffee.html` is the whole presentation in one file. Email it, put it on any web host, or open it from disk.
+This writes `dist/coffee.html` (ignored by git; use `-o` to choose another path). It is the whole presentation in one file. Email it, put it on any web host, or open it from disk.
 
 **5. Optional: use it from any folder.** Run `npm link` once in the `wayforge` folder. After that, the `wayforge` command works anywhere, so your journeys can live in their own folder or repository:
 

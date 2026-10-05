@@ -43,7 +43,7 @@ Edit the JSON and save; the page rebuilds and reloads. When something is wrong, 
 
 ```bash
 npx wayforge validate journeys/local/my-story.json    # errors and warnings only
-npx wayforge build journeys/local/my-story.json -o my-story.html
+npx wayforge build journeys/local/my-story.json       # writes dist/my-story.html (or -o path.html)
 npx wayforge snapshot journeys/local/my-story.json    # PNG of every step (needs, once: npx playwright install chromium)
 ```
 
