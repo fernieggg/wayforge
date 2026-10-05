@@ -11,8 +11,8 @@
       "sys": "#1d6fd8", "deep": "#6a52e0", "deep-soft": "rgba(106,82,224,.15)",
       "packet": "#e08a00", "glass": "rgba(255,255,255,.78)", "btn-ink": "#ffffff",
       "grid": "rgba(20,40,120,.09)", "glow": "rgba(29,111,216,.10)",
-      "bk": "#d6336c", "nur": "#0b9a74", "panel-bk": "rgba(214,51,108,.05)", "panel-nur": "rgba(11,154,116,.06)",
-      "wk": "#4c8a00", "wk-soft": "rgba(76,138,0,.14)"
+      "pink": "#d6336c", "teal": "#0b9a74", "panel-pink": "rgba(214,51,108,.05)", "panel-teal": "rgba(11,154,116,.06)",
+      "lime": "#4c8a00", "lime-soft": "rgba(76,138,0,.14)"
     },
     "dark": {
       "bg": "#070b18", "ink": "#e9eeff", "muted": "#8e9bc6",
@@ -20,17 +20,17 @@
       "sys": "#5cc8ff", "deep": "#a596ff", "deep-soft": "rgba(165,150,255,.2)",
       "packet": "#ffc15a", "glass": "rgba(12,19,42,.78)", "btn-ink": "#06101f",
       "grid": "rgba(120,150,255,.10)", "glow": "rgba(92,200,255,.10)",
-      "bk": "#ff8fa8", "nur": "#4fe3b5", "panel-bk": "rgba(255,143,168,.04)", "panel-nur": "rgba(79,227,181,.04)",
-      "wk": "#b8f26a", "wk-soft": "rgba(184,242,106,.16)"
+      "pink": "#ff8fa8", "teal": "#4fe3b5", "panel-pink": "rgba(255,143,168,.04)", "panel-teal": "rgba(79,227,181,.04)",
+      "lime": "#b8f26a", "lime-soft": "rgba(184,242,106,.16)"
     }
   },
   "defaultTone": "blue",
   "tones": {
     "blue": { "color": "sys" },
     "violet": { "color": "deep", "soft": "deep-soft", "panel": "panel" },
-    "pink": { "color": "bk", "panel": "panel-bk" },
-    "teal": { "color": "nur", "panel": "panel-nur" },
-    "lime": { "color": "wk", "soft": "wk-soft" }
+    "pink": { "color": "pink", "panel": "panel-pink" },
+    "teal": { "color": "teal", "panel": "panel-teal" },
+    "lime": { "color": "lime", "soft": "lime-soft" }
   },
   "opacity": { "node": 0.32, "edge": 0.5, "label": 0.35, "dim": 0.45 },
   "metrics": {

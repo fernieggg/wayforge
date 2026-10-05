@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { readJson } from '../../src/model/load';
 import type { Issue } from '../../src/model/types';
 import { validateFile, validateJourney } from '../../src/validate';
-import { HAS_LEAD_JOURNEY, LEAD_JOURNEY } from '../private';
+import { HAS_REGRESSION_JOURNEY, REGRESSION_JOURNEY } from '../regression/env';
 
 const ROOT = resolve(__dirname, '../..');
 const theme = readJson(resolve(ROOT, 'themes/default.json'));
@@ -26,11 +26,10 @@ describe('valid journeys', () => {
     }
   });
 
-  it.skipIf(!HAS_LEAD_JOURNEY)('accepts dataset #1', () => {
-    const { issues, resolved } = validateFile(LEAD_JOURNEY);
+  it.skipIf(!HAS_REGRESSION_JOURNEY)('accepts the regression journey', () => {
+    const { issues, resolved } = validateFile(REGRESSION_JOURNEY!);
     expect(errors(issues)).toEqual([]);
     expect(resolved).toBeDefined();
-    expect(Object.fromEntries(Object.entries(resolved!.scenes).map(([k, v]) => [k, v.length]))).toEqual({ prospect: 6, data: 5, both: 8 });
   });
 });
 

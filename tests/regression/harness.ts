@@ -1,5 +1,6 @@
 import type { Browser, Page } from '@playwright/test';
 import { goToScene, openPage } from '../../src/cli/drive';
+import { validateFile } from '../../src/validate';
 
 export interface Target {
   lensKey: string;
@@ -100,12 +101,19 @@ export function diff(a: unknown, b: unknown, path = ''): string[] {
   return out;
 }
 
-/** The lens keys and step counts of dataset #1 (Prospect 6, Data 5, Both 8). */
-export const LEAD_TARGETS: { lens: string; key: string; count: number }[] = [
-  { lens: 'prospect', key: '1', count: 6 },
-  { lens: 'data', key: '2', count: 5 },
-  { lens: 'both', key: '3', count: 8 },
-];
+export interface LensTarget {
+  lens: string;
+  /** The keyboard key that selects the lens (lenses are numbered in journey order). */
+  key: string;
+  count: number;
+}
+
+/** Every lens of a journey, with its selection key and step count. */
+export function targets(journeyFile: string): LensTarget[] {
+  const { resolved } = validateFile(journeyFile);
+  if (!resolved) throw new Error(`${journeyFile} failed validation`);
+  return resolved.lenses.map((l, i) => ({ lens: l.id, key: String(i + 1), count: resolved.scenes[l.id]?.length ?? 0 }));
+}
 
 /** Declared transitions of every element on the page, in document order. */
 export function captureTransitions(page: Page) {

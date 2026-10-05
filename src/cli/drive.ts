@@ -13,7 +13,7 @@ export interface DriveOptions {
 
 const START = new Date('2026-01-01T00:00:00Z');
 
-/** Opens a Wayforge page (or the reference) with a frozen clock so frames are reproducible. */
+/** Opens a page with a frozen clock so frames are reproducible. */
 export async function openPage(browser: Browser, url: string, o: DriveOptions): Promise<Page> {
   const ctx = await browser.newContext({
     viewport: { width: o.width ?? 1440, height: o.height ?? 900 },

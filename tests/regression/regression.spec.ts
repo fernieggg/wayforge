@@ -3,19 +3,23 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { buildFile } from '../../src/cli/build';
-import { HAS_LEAD_JOURNEY, HAS_REFERENCE, LEAD_JOURNEY, REFERENCE } from '../private';
-import { align, capture, captureTransitions, diff, goTo, LEAD_TARGETS, open, pixelDiff } from './harness';
+import { HAS_REGRESSION, REGRESSION_JOURNEY, REGRESSION_REFERENCE } from './env';
+import { align, capture, captureTransitions, diff, goTo, open, pixelDiff, targets, type LensTarget } from './harness';
 
 const ROOT = resolve(import.meta.dirname, '../..');
-const JOURNEY = LEAD_JOURNEY;
-const BUILT = resolve(ROOT, `test-results/parity/lead-journey-${process.pid}.html`);
-const ARTIFACTS = resolve(ROOT, 'test-results/parity');
+const ARTIFACTS = resolve(ROOT, 'test-results/regression');
+const BUILT = resolve(ARTIFACTS, `build-${process.pid}.html`);
 // Font rendering differs by a few anti-aliased pixels at most; anything more is a real difference.
 const MAX_DIFF_RATIO = 0.0005;
 
-test.skip(!HAS_REFERENCE || !HAS_LEAD_JOURNEY, 'the private data repo (dataset #1 and the reference) is not present');
+test.skip(!HAS_REGRESSION, 'set WAYFORGE_REGRESSION_JOURNEY and WAYFORGE_REGRESSION_REFERENCE to run the visual regression suite');
+
+const JOURNEY = REGRESSION_JOURNEY!;
+const REFERENCE = REGRESSION_REFERENCE!;
+let TARGETS: LensTarget[] = [];
 
 test.beforeAll(async () => {
+  TARGETS = targets(JOURNEY);
   const html = await buildFile(JOURNEY);
   if (html === null) throw new Error(`${JOURNEY} failed validation`);
   mkdirSync(ARTIFACTS, { recursive: true });
@@ -32,7 +36,7 @@ for (const scheme of ['light', 'dark'] as const) {
       const out = await open(browser, url(BUILT), { scheme, reducedMotion });
       await align(ref, out);
       const failures: string[] = [];
-      for (const t of LEAD_TARGETS) {
+      for (const t of TARGETS) {
         for (let s = 0; s < t.count; s++) {
           await goTo(ref, { lensKey: t.key, steps: s });
           await goTo(out, { lensKey: t.key, steps: s });
@@ -53,9 +57,9 @@ for (const scheme of ['light', 'dark'] as const) {
   }
 }
 
-test('step counts are Prospect 6, Data 5, Both 8', async ({ browser }) => {
+test('each lens shows one step dot per scene', async ({ browser }) => {
   const out = await open(browser, url(BUILT), { scheme: 'light' });
-  for (const t of LEAD_TARGETS) {
+  for (const t of TARGETS) {
     await goTo(out, { lensKey: t.key, steps: 0 });
     expect(await out.locator('.dot').count(), t.lens).toBe(t.count);
   }

@@ -42,16 +42,16 @@ describe('visibility', () => {
     expect(visibleIn(['a', 'b'], 'b')).toBe(true);
   });
 
-  const order = ['overview', 'ads', 'landing', 'gate', 'data', 'sfrec', 'lcap', 'handoff', 'event', 'full'];
+  const order = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9'];
   const keys = (...k: string[]) => k.map((key) => ({ key }));
   it('keeps the same key when the lens has it', () => {
-    expect(placeKeepingIndex(keys('overview', 'landing', 'data'), 'data', order)).toBe(2);
+    expect(placeKeepingIndex(keys('s0', 's2', 's4'), 's4', order)).toBe(2);
   });
   it('falls back to the nearest stage, later on a tie', () => {
-    // From Both "gate" into Data: landing (distance 1) and data (distance 1) tie, so data wins.
-    expect(placeKeepingIndex(keys('overview', 'landing', 'data', 'sfrec', 'lcap'), 'gate', order)).toBe(2);
-    // From Data "sfrec" into Prospect: gate (2) vs handoff (2) tie, so handoff wins.
-    expect(placeKeepingIndex(keys('overview', 'ads', 'landing', 'gate', 'handoff', 'full'), 'sfrec', order)).toBe(4);
+    // From s3: s2 (distance 1) and s4 (distance 1) tie, so s4 wins.
+    expect(placeKeepingIndex(keys('s0', 's2', 's4', 's5', 's6'), 's3', order)).toBe(2);
+    // From s5: s3 (distance 2) and s7 (distance 2) tie, so s7 wins.
+    expect(placeKeepingIndex(keys('s0', 's1', 's2', 's3', 's7', 's9'), 's5', order)).toBe(4);
   });
 });
 

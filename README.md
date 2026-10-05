@@ -221,7 +221,7 @@ npm run test:browser      # end-to-end and visual tests in a real browser (Playw
 npm run typecheck
 ```
 
-The visual regression suite in `tests/parity/` compares builds against a reference page kept outside this repository. It runs when that reference is available (see `WAYFORGE_PRIVATE_DIR` in `tests/private.ts`) and skips otherwise.
+The visual regression suite in `tests/regression/` builds a journey and compares every scene, in every lens and both themes, against a reference HTML page. Point it at the pair with `WAYFORGE_REGRESSION_JOURNEY` and `WAYFORGE_REGRESSION_REFERENCE`; it skips when they are unset. `npm run regression:report` prints the differences without failing.
 
 ## Roadmap
 

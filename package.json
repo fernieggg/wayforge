@@ -17,7 +17,7 @@
     "test": "npm run build:runtime && vitest run",
     "test:browser": "npm run build:runtime && playwright test",
     "wayforge": "tsx src/cli/index.ts",
-    "parity:report": "tsx scripts/parity-report.ts"
+    "regression:report": "tsx scripts/regression-report.ts"
   },
   "dependencies": {
     "ajv": "^8.20.0"

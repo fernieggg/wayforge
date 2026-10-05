@@ -22,7 +22,7 @@ function rootVars(theme: Theme): string {
   ].join('\n');
 }
 
-/** Page chrome: header, footer, buttons, dots. Mirrors the reference page. */
+/** Page chrome: header, footer, buttons, dots. */
 function chromeCss(theme: Theme): string {
   const text = fontStack(theme.fonts.text);
   const heading = fontStack(theme.fonts.heading);
@@ -75,8 +75,8 @@ footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px 40px;align
 
 /**
  * Map styles. Opacity is always base x ghost x lens, each a CSS variable so each
- * factor transitions on its own. Selector specificity follows the reference so the
- * cascade resolves the same way (for example, rows inherit a strong outline).
+ * factor transitions on its own. Selector specificity is deliberate so the
+ * cascade resolves as intended (for example, rows inherit a strong outline).
  */
 function mapCss(r: ResolvedJourney): string {
   const { theme } = r;

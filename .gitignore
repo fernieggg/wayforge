@@ -7,9 +7,5 @@ playwright-report/
 .env
 *.log
 
-# Private data lives in the wayforge-private repo. Never commit it here.
-/reference/
-/journeys/lead-journey.json
-
 # Your own journeys. Ignored so they never mix with the examples.
 /journeys/local/
