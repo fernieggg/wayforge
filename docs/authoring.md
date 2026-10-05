@@ -1,6 +1,6 @@
 # Authoring journeys
 
-This guide covers everything needed to write a working Wayforge journey from scratch: the workflow, every field, colors, layout, scenes, sub-flows, and what each validation message means. If you are an LLM, or briefing one, also read [llm-authoring.md](llm-authoring.md).
+This guide covers everything needed to write a working Wayforge journey from scratch: the workflow, every field, colors, layout, scenes, sub-flows, and what each validation message means. To have an LLM write a journey for you, give it [llm-authoring.md](llm-authoring.md) instead.
 
 - [1. What you are making](#1-what-you-are-making)
 - [2. Workflow](#2-workflow)
@@ -56,12 +56,10 @@ Answer these on paper first. Layout is the slow part, and a plan makes it fast.
 6. **A rough grid.** Sketch the nodes in columns (left to right is the usual reading order) and lanes (rows). See [section 7](#7-layout-guide) for spacing numbers.
 7. **The scenes.** For each lens: which stages, what the camera frames, what lights up, what the caption says.
 
-Rules worth keeping from the start:
+Two features help while the story is still settling:
 
-- **Never invent facts.** Only put in what you know. If a connection or system is unknown, leave it out or mark it in `notes`.
-- **Flag placeholders.** A title chosen to fill space ("CRM records") gets a `notes` entry so it can be confirmed later.
-- **Park, don't delete.** To hide something for now, set `"lenses": []`. It stays in the file.
-- **Captions describe only what is on screen.**
+- **`notes`** can go on almost anything and is never shown. Use it for things to confirm later, such as a title you picked as a stand-in.
+- **`"lenses": []`** hides an element everywhere without deleting it, so it is easy to bring back.
 
 ## 4. File anatomy
 
