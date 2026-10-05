@@ -8,7 +8,7 @@
     "wayforge": "bin/wayforge.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   },
   "scripts": {
     "build:runtime": "vite build",

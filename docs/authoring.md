@@ -27,22 +27,31 @@ A journey is one JSON file. Wayforge turns it into one self-contained HTML page:
 
 ## 2. Workflow
 
-```bash
-npm install                                   # once, in the wayforge folder
-npx wayforge dev journeys/my-story.json       # live preview at http://localhost:5173
-```
-
-Edit the JSON and save; the page rebuilds and reloads. When something is wrong, the page lists the errors with their exact location instead. Then:
+You need Node.js 22.12 or later. Once, in the `wayforge` folder:
 
 ```bash
-npx wayforge validate journeys/my-story.json  # errors and warnings only
-npx wayforge build journeys/my-story.json -o my-story.html
-npx wayforge snapshot journeys/my-story.json  # PNG of every step (needs: npx playwright install chromium)
+npm install
 ```
 
-Start the file with `"$schema": "../schema/journey.schema.json"` (path relative to your file). Editors such as VS Code then autocomplete fields, show their documentation on hover and underline mistakes.
+Keep your journeys in `journeys/local/`, which git ignores, so your work stays separate from the examples. Then open the live preview:
 
-The fastest way to start is to copy `journeys/examples/support-ticket.json` or the example in [section 12](#12-a-complete-example).
+```bash
+npx wayforge dev journeys/local/my-story.json   # http://localhost:5173
+```
+
+Edit the JSON and save; the page rebuilds and reloads. When something is wrong, the page lists the errors with their exact location instead. The other commands:
+
+```bash
+npx wayforge validate journeys/local/my-story.json    # errors and warnings only
+npx wayforge build journeys/local/my-story.json -o my-story.html
+npx wayforge snapshot journeys/local/my-story.json    # PNG of every step (needs, once: npx playwright install chromium)
+```
+
+To use Wayforge from any folder, run `npm link` once in the `wayforge` folder; then `wayforge dev path/to/story.json` works anywhere.
+
+Start each file with a `"$schema"` line pointing at `schema/journey.schema.json`, relative to your file: `"../../schema/journey.schema.json"` from `journeys/local/`, or an absolute path for files elsewhere. Editors such as VS Code then autocomplete fields, show their documentation on hover and underline mistakes. The line only affects editor help, never the build.
+
+The fastest way to start is to copy the example in [section 12](#12-a-complete-example) or one from `journeys/examples/`.
 
 ## 3. Plan before you type
 
@@ -485,11 +494,11 @@ On touch screens, swipe left or right to step. The page follows the viewer's lig
 
 ## 12. A complete example
 
-A small journey that exercises most features: two lenses, a layer, a panel, every node kind, a pill, a dashed edge, a hidden pass-through edge, labels, packets with phase and dim, a row effect, groups, and a parked element. Save it as `journeys/coffee.json` and run `npx wayforge dev journeys/coffee.json`.
+A small journey that exercises most features: two lenses, a layer, a panel, every node kind, a pill, a dashed edge, a hidden pass-through edge, labels, packets with phase and dim, a row effect, groups, and a parked element. Save it as `journeys/local/coffee.json` and run `npx wayforge dev journeys/local/coffee.json`.
 
 ```json
 {
-  "$schema": "../schema/journey.schema.json",
+  "$schema": "../../schema/journey.schema.json",
   "version": 1,
   "meta": {
     "title": "Ordering a coffee",

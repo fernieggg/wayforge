@@ -173,7 +173,7 @@ Neither file appears in this repo or its history (history was rewritten with `gi
 
 ## Tooling and commands
 
-Unless the user says otherwise: Node 20+, TypeScript, Vite with a single-file plugin for the build, Ajv for JSON Schema, Vitest for unit tests, Playwright for screenshots. Keep the dependency list short.
+Unless the user says otherwise: Node 22.12+ (Vite and Vitest need it; the CLI checks at startup), TypeScript, Vite with a single-file plugin for the build, Ajv for JSON Schema, Vitest for unit tests, Playwright for screenshots. Keep the dependency list short.
 
 Commands to implement and keep working (document them in `README.md` once they exist):
 

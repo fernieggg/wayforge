@@ -20,17 +20,58 @@ journey.json  ──►  wayforge build  ──►  journey.html  (one self-cont
 
 ## Quick start
 
-Requires Node 20 or later.
+You need [Node.js](https://nodejs.org) 22.12 or later (`node --version` to check) and git.
+
+**1. Install.**
 
 ```bash
+git clone https://github.com/fernieggg/wayforge.git
+cd wayforge
 npm install
-npx wayforge dev journeys/examples/support-ticket.json      # live preview at http://localhost:5173
-npx wayforge build journeys/examples/support-ticket.json -o support-ticket.html
 ```
 
-`dev` rebuilds and reloads the page every time you save. Open the built file in any browser.
+**2. See an example.**
 
-To write your own, read **[docs/authoring.md](docs/authoring.md)**, the complete guide: workflow, every field, colors, layout with concrete numbers, scenes, sub-flows, and what every validation message means. To have an LLM write one, give it **[docs/llm-authoring.md](docs/llm-authoring.md)**.
+```bash
+npx wayforge dev journeys/examples/support-ticket.json
+```
+
+Open http://localhost:5173 and step through it with the arrow keys; press 1 or 2 to switch views. The first run takes a few extra seconds while Wayforge compiles its browser code. Stop the preview with Ctrl+C.
+
+**3. Start your own.** Keep your journeys in `journeys/local/`; that folder is ignored by git, so your work never mixes with the examples. Copy the example from [section 12 of the authoring guide](docs/authoring.md#12-a-complete-example) into `journeys/local/coffee.json` and preview it:
+
+```bash
+npx wayforge dev journeys/local/coffee.json
+```
+
+Edit the file and save: the page rebuilds and reloads on every save, and shows the exact location of any mistake.
+
+**4. Build and share.**
+
+```bash
+npx wayforge build journeys/local/coffee.json -o coffee.html
+```
+
+`coffee.html` is the whole presentation in one file. Email it, put it on any web host, or open it from disk.
+
+**5. Optional: use it from any folder.** Run `npm link` once in the `wayforge` folder. After that, the `wayforge` command works anywhere, so your journeys can live in their own folder or repository:
+
+```bash
+wayforge dev ~/talks/onboarding.json
+```
+
+For editor help in files outside the clone, point `"$schema"` at the clone's `schema/journey.schema.json` (a relative or absolute path); it does not affect the build.
+
+**6. Optional: screenshots of every step.**
+
+```bash
+npx playwright install chromium     # once
+npx wayforge snapshot journeys/local/coffee.json
+```
+
+PNGs land in `snapshots/coffee/`.
+
+Next, read **[docs/authoring.md](docs/authoring.md)**, the complete guide: every field, colors, layout with concrete numbers, scenes, sub-flows, and what every validation message means. To have an LLM write a journey, give it **[docs/llm-authoring.md](docs/llm-authoring.md)**.
 
 ## How it works
 
@@ -54,7 +95,7 @@ A journey is one JSON file, validated against [`schema/journey.schema.json`](sch
 
 ```json
 {
-  "$schema": "../schema/journey.schema.json",
+  "$schema": "../../schema/journey.schema.json",
   "version": 1,
   "meta": { "title": "A support ticket, start to finish", "brand": "Support flow" },
   "lenses": [
@@ -160,7 +201,7 @@ The built page is a single HTML file, well under the 16 MB limit of strict page 
 ```
 schema/        journey.schema.json, theme.schema.json
 themes/        default.json (design tokens)
-journeys/      examples/ (support-ticket, support-queue, knowledge-base)
+journeys/      examples/ (support-ticket, support-queue, knowledge-base); local/ for your own (ignored by git)
 docs/          authoring.md (complete guide), llm-authoring.md (brief for an LLM)
 src/
   model/       loading, defaults, sub-flow tree, lens rules, generated schema types

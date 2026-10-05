@@ -4,7 +4,7 @@ You are turning a plain-language description of a process, journey or system int
 
 ## Your output
 
-1. **One JSON file** that validates against `schema/journey.schema.json`, with no errors and ideally no warnings.
+1. **One JSON file** that validates against `schema/journey.schema.json`, with no errors and ideally no warnings. Save it in `journeys/local/<name>.json` (ignored by git) with `"$schema": "../../schema/journey.schema.json"` as its first field.
 2. **A short list of open questions and assumptions**, outside the JSON: anything you were not told and therefore left out, simplified or marked as a placeholder.
 
 If you can run commands, validate with `npx wayforge validate <file>` and fix everything it reports before you finish. Every message names the exact path, for example `scenes.team[2].routes[0].edges[1]: unknown edge "qa"`.
@@ -126,7 +126,7 @@ A minimal valid journey to start from. Replace the content, keep the structure.
 
 ```json
 {
-  "$schema": "../schema/journey.schema.json",
+  "$schema": "../../schema/journey.schema.json",
   "version": 1,
   "meta": { "title": "Story title", "description": "One or two sentences describing the whole map for screen readers." },
   "lenses": [{ "id": "main", "label": "Overview", "default": true }],

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { nodeTooOld } from '../../src/cli/node-version';
 import { pathEnds } from '../../src/geometry/path';
 import { expandRefs } from '../../src/model/groups';
 import { deepMerge } from '../../src/model/merge';
@@ -58,5 +59,15 @@ describe('deepMerge', () => {
   it('merges objects and replaces arrays', () => {
     expect(deepMerge({ a: { b: 1, c: [1, 2] }, d: 1 }, { a: { c: [3] } })).toEqual({ a: { b: 1, c: [3] }, d: 1 });
     expect(deepMerge({ a: 1 }, undefined)).toEqual({ a: 1 });
+  });
+});
+
+describe('nodeTooOld', () => {
+  it('compares versions numerically', () => {
+    expect(nodeTooOld('20.10.0', '22.12.0')).toBe(true);
+    expect(nodeTooOld('22.11.9', '22.12.0')).toBe(true);
+    expect(nodeTooOld('22.12.0', '22.12.0')).toBe(false);
+    expect(nodeTooOld('24.14.0', '22.12.0')).toBe(false);
+    expect(nodeTooOld('22.100.0', '22.12.0')).toBe(false);
   });
 });

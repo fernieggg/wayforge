@@ -1,4 +1,5 @@
 import { parseArgs } from 'node:util';
+import { MIN_NODE, nodeTooOld } from './node-version';
 import { runValidate } from './validate';
 
 const USAGE = `wayforge <command> [options]
@@ -19,6 +20,11 @@ const COMMANDS: Record<string, (args: string[]) => Promise<number> | number> = {
 };
 
 async function main(argv: string[]): Promise<number> {
+  // Fail clearly up front rather than deep inside the build tooling.
+  if (nodeTooOld(process.versions.node)) {
+    console.error(`wayforge needs Node ${MIN_NODE} or later (you have ${process.versions.node}). Install the current LTS from https://nodejs.org.`);
+    return 1;
+  }
   const { positionals } = parseArgs({ args: argv.slice(0, 1), allowPositionals: true, strict: false });
   const name = positionals[0];
   const command = name ? COMMANDS[name] : undefined;
