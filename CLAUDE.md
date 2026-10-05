@@ -160,7 +160,9 @@ The repo will become public. Build with that in mind from the start:
 - **Dataset #1 is not public-safe yet.** `journeys/lead-journey.json` describes a real process. It lives only in the private `wayforge-private` repo, never in this one (both paths are in `.gitignore`). Public example journeys go in `journeys/examples/` and must be generic.
 - **No secrets, ever.** There should be none to begin with. Add a `.gitignore` and an `.env.example` placeholder, and never commit credentials.
 - **Package identity.** Scoped npm package `@<owner>/wayforge` with a `wayforge` binary. Do not publish anything without the user's explicit go-ahead.
-- **Name hygiene.** Use "Wayforge" consistently. Do not reuse names of other projects in code or docs. A domain and trademark check is still pending; flag it before any public release.
+- **Name hygiene.** Use "Wayforge" consistently. Do not reuse names of other projects in code or docs. On 2026-10-04 npm and PyPI had no `wayforge` package and the closest GitHub match was a small unrelated repo. A domain and trademark check is still pending; flag it before any public release.
+- **Discoverability.** The name is a coined word, so the repo description and topics do the search work. One-liner: "Diagram-as-code for animated, multi-lens journey and architecture presentations." Topics: `diagram-as-code`, `visualization`, `svg`, `presentation`, `journey-map`, `architecture-diagram`.
+- **README is for users.** It describes the product. Project history, parity work and private-data details belong here, not in the README.
 - **Before launch:** license file (ask which), `CONTRIBUTING.md`, CI running validation, parity and screenshot tests, and a README quick start that works on a clean machine.
 
 ## Private data
