@@ -165,7 +165,7 @@ The repo will become public. Build with that in mind from the start:
 
 ## Private data
 
-Dataset #1 (`journeys/lead-journey.json`) and the golden master (`reference/lead-journey.html`) live in a separate local repo, `../wayforge-private` next to this checkout, or wherever `WAYFORGE_PRIVATE_DIR` points. Both repos are local-only for now: do not create remotes or push without the user's go-ahead. `tests/private.ts` resolves the paths. Tests that need the data skip when it is absent. Build dataset #1 with `npx wayforge build ../wayforge-private/journeys/lead-journey.json`. Edits to dataset #1 are commits in that repo, not this one.
+Dataset #1 (`journeys/lead-journey.json`) and the golden master (`reference/lead-journey.html`) live in a separate local repo, `../wayforge-private` next to this checkout, or wherever `WAYFORGE_PRIVATE_DIR` points. This repo is on GitHub as the private `fernieggg/wayforge`; `wayforge-private` is local-only. Do not push the private repo, add remotes, or change visibility without the user's go-ahead. `tests/private.ts` resolves the paths. Tests that need the data skip when it is absent. Build dataset #1 with `npx wayforge build ../wayforge-private/journeys/lead-journey.json`. Edits to dataset #1 are commits in that repo, not this one.
 
 Neither file appears in this repo or its history (history was rewritten with `git filter-repo`; the pre-rewrite history is archived in `wayforge-private/archive/`). Keep it that way: dataset-specific names, notes and open questions go in `wayforge-private/NOTES.md`.
 
