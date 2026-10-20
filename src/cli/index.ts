@@ -5,14 +5,19 @@ import { runValidate } from './validate';
 const USAGE = `wayforge <command> [options]
 
 Commands:
+  init [folder] [--name story.json]            set up a folder: a starter journey, the guides, and AGENTS.md for AI tools
+  docs [authoring|llm|schema]                  where the guides are, or print one
   validate <journey.json> [--strict]           check a journey against the schema and integrity rules
   build <journey.json> [-o out.html] [--strict] build one self-contained HTML file
   dev <journey.json> [--port 5173]             serve the journey and rebuild on change
   snapshot <journey.json> [--lens id] [--theme light|dark] [-o dir]
                                                PNG of every scene in every lens
+  --version                                    print the installed version
 `;
 
 const COMMANDS: Record<string, (args: string[]) => Promise<number> | number> = {
+  init: async (args) => (await import('./init')).runInit(args),
+  docs: async (args) => (await import('./docs')).runDocs(args),
   validate: runValidate,
   build: async (args) => (await import('./build')).runBuild(args),
   dev: async (args) => (await import('./dev')).runDev(args),
@@ -27,6 +32,10 @@ async function main(argv: string[]): Promise<number> {
   }
   const { positionals } = parseArgs({ args: argv.slice(0, 1), allowPositionals: true, strict: false });
   const name = positionals[0];
+  if (argv[0] === '--version' || argv[0] === '-v') {
+    process.stdout.write((await import('./init')).packageVersion() + '\n');
+    return 0;
+  }
   const command = name ? COMMANDS[name] : undefined;
   if (!command) {
     process.stderr.write(USAGE);

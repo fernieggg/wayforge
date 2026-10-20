@@ -1,0 +1,42 @@
+{
+  "$schema": "./.wayforge/schema/journey.schema.json",
+  "version": 1,
+  "meta": { "title": "My story", "description": "One or two sentences describing the whole map for screen readers." },
+  "lenses": [{ "id": "main", "label": "Overview", "default": true }],
+  "stageOrder": ["start", "decide", "finish"],
+  "nodes": [
+    { "id": "a", "kind": "circle", "at": [40, 150], "size": [100, 100], "title": "Start" },
+    { "id": "b", "kind": "diamond", "at": [220, 110], "size": [180, 180], "title": "Ready?" },
+    { "id": "c", "kind": "box", "at": [480, 155], "size": [220, 90], "title": "Finish", "subtitle": "all done" }
+  ],
+  "edges": [
+    { "id": "ab", "path": "M140 200 L220 200" },
+    { "id": "bc", "path": "M400 200 L480 200" }
+  ],
+  "labels": [{ "edge": "bc", "at": [440, 188], "anchor": "middle", "text": "yes" }],
+  "scenes": {
+    "main": [
+      {
+        "key": "start", "label": "Start", "title": "It starts here",
+        "caption": "Something begins and moves to a decision.",
+        "camera": [0, 60, 460, 280],
+        "active": { "nodes": ["a", "b"], "edges": ["ab"] },
+        "routes": [{ "edges": ["ab"] }]
+      },
+      {
+        "key": "decide", "label": "Decide", "title": "A decision",
+        "caption": "When it is ready, it moves on to the finish.",
+        "camera": [180, 60, 560, 280],
+        "active": { "nodes": ["b", "c"], "edges": ["bc"] },
+        "routes": [{ "edges": ["bc"] }]
+      },
+      {
+        "key": "finish", "label": "Finish", "title": "The whole path",
+        "caption": "From the start, through the decision, to the finish.",
+        "camera": [0, 40, 740, 320],
+        "active": { "nodes": ["a", "b", "c"], "edges": ["ab", "bc"] },
+        "routes": [{ "edges": ["ab", "bc"] }]
+      }
+    ]
+  }
+}

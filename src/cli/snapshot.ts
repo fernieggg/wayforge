@@ -1,4 +1,5 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { basename, extname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -56,8 +57,14 @@ export async function runSnapshot(args: string[]): Promise<number> {
   try {
     ({ chromium } = await import('@playwright/test'));
   } catch {
-    process.stderr.write('error: wayforge snapshot needs Playwright (npm install -D @playwright/test && npx playwright install chromium)\n');
-    return 1;
+    // An installed wayforge has no Playwright of its own; use one installed where the command runs.
+    try {
+      const local = createRequire(join(process.cwd(), 'noop.js')).resolve('@playwright/test');
+      ({ chromium } = (await import(pathToFileURL(local).href)) as typeof import('@playwright/test'));
+    } catch {
+      process.stderr.write('error: wayforge snapshot needs Playwright. Once, in this folder: npm install @playwright/test && npx playwright install chromium\n');
+      return 1;
+    }
   }
   const browser = await chromium.launch();
   let count = 0;
