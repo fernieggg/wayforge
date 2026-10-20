@@ -25,10 +25,10 @@ You need [Node.js](https://nodejs.org) 22.12 or later (`node --version` to check
 **1. Install, once.**
 
 ```bash
-npm install -g github:fernieggg/wayforge
+npm install -g wayforge
 ```
 
-This puts the `wayforge` command on your computer. From then on it works in any folder; you never need to look at this repository again.
+This puts the `wayforge` command on your computer. From then on it works in any folder; you never need to look at this repository again. (To try unreleased changes, install from GitHub instead: `npm install -g github:fernieggg/wayforge`.)
 
 **2. Start a folder for your journeys.**
 
@@ -249,7 +249,7 @@ The visual regression suite in `tests/regression/` builds a journey and compares
 
 ## Status
 
-Wayforge is in active development and not yet published to npm.
+Wayforge is in active development (version 0.x), so details may still change between releases. It is published on npm as [`wayforge`](https://www.npmjs.com/package/wayforge).
 
 ## License
 

@@ -1,7 +1,6 @@
 {
   "name": "wayforge",
   "version": "0.1.0",
-  "private": true,
   "description": "Diagram-as-code for animated, multi-lens journey and architecture presentations.",
   "keywords": [
     "diagram-as-code",

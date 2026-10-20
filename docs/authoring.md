@@ -27,7 +27,7 @@ A journey is one JSON file. Wayforge turns it into one self-contained HTML page:
 
 ## 2. Workflow
 
-You need Node.js 22.12 or later. Install Wayforge once (`npm install -g github:fernieggg/wayforge`), then set up a folder for your journeys:
+You need Node.js 22.12 or later. Install Wayforge once (`npm install -g wayforge`), then set up a folder for your journeys:
 
 ```bash
 wayforge init my-talk     # a starter story.json, these guides in .wayforge/, and AGENTS.md for AI tools
