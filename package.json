@@ -3,6 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "description": "Diagram-as-code for animated, multi-lens journey and architecture presentations.",
+  "keywords": [
+    "diagram-as-code",
+    "visualization",
+    "svg",
+    "presentation",
+    "journey-map",
+    "architecture-diagram"
+  ],
+  "license": "MIT",
+  "author": "Fernando Garcia",
+  "homepage": "https://github.com/fernieggg/wayforge#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fernieggg/wayforge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fernieggg/wayforge/issues"
+  },
   "type": "module",
   "bin": {
     "wayforge": "bin/wayforge.js"

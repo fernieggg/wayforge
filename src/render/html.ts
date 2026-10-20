@@ -6,6 +6,9 @@ import { attrs, esc, scriptJson } from './escape';
 import { runtimeData } from './runtimeData';
 import { buildSvg } from './svg';
 
+// MIT asks for the notice to travel with copies of the code, and every built page inlines the runtime.
+const RUNTIME_NOTICE = '/*! Wayforge | (c) 2026 Fernando Garcia | MIT License */';
+
 /** One stylesheet link for every Google font used by any flow (root fonts first). */
 export function googleFontsUrl(themes: readonly Theme[]): string | null {
   const seen = new Set<string>();
@@ -56,7 +59,8 @@ ${buildSvg(flows)}
 </main>
 ${buildFooter(r, scenes, 0)}
 <script type="application/json" id="wf-data">${scriptJson(runtimeData(flows))}</script>
-<script>${runtimeJs.replace(/<\/script/gi, '<\\/script')}</script>
+<script>${RUNTIME_NOTICE}
+${runtimeJs.replace(/<\/script/gi, '<\\/script')}</script>
 </body>
 </html>
 `;
