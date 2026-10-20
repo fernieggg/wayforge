@@ -27,31 +27,40 @@ A journey is one JSON file. Wayforge turns it into one self-contained HTML page:
 
 ## 2. Workflow
 
-You need Node.js 22.12 or later. Once, in the `wayforge` folder:
+You need Node.js 22.12 or later. Install Wayforge once (`npm install -g github:fernieggg/wayforge`), then set up a folder for your journeys:
 
 ```bash
-npm install
-```
-
-Keep your journeys in `journeys/local/`, which git ignores, so your work stays separate from the examples. Then open the live preview:
-
-```bash
-npx wayforge dev journeys/local/my-story.json   # http://localhost:5173
+wayforge init my-talk     # a starter story.json, these guides in .wayforge/, and AGENTS.md for AI tools
+cd my-talk
+wayforge dev story.json   # live preview at http://localhost:5173
 ```
 
 Edit the JSON and save; the page rebuilds and reloads. When something is wrong, the page lists the errors with their exact location instead. The other commands:
 
 ```bash
-npx wayforge validate journeys/local/my-story.json    # errors and warnings only
-npx wayforge build journeys/local/my-story.json       # writes dist/my-story.html (or -o path.html)
-npx wayforge snapshot journeys/local/my-story.json    # PNG of every step (needs, once: npx playwright install chromium)
+wayforge validate story.json    # errors and warnings only
+wayforge build story.json       # writes dist/story.html (or -o path.html)
+wayforge snapshot story.json    # PNG of every step (needs, once in this folder: npm install @playwright/test && npx playwright install chromium)
+wayforge docs llm               # print the LLM brief from the installed version
 ```
 
-To use Wayforge from any folder, run `npm link` once in the `wayforge` folder; then `wayforge dev path/to/story.json` works anywhere.
+A journey folder made by `wayforge init` holds:
 
-Start each file with a `"$schema"` line pointing at `schema/journey.schema.json`, relative to your file: `"../../schema/journey.schema.json"` from `journeys/local/`, or an absolute path for files elsewhere. Editors such as VS Code then autocomplete fields, show their documentation on hover and underline mistakes. The line only affects editor help, never the build.
+| Path | What it is |
+|---|---|
+| `story.json` | The starter journey. Add as many journey files as you like next to it. |
+| `.wayforge/docs/` | This guide and the LLM brief. |
+| `.wayforge/schema/` | The JSON Schema, for editor help. |
+| `.wayforge/examples/` | Complete example journeys. |
+| `AGENTS.md`, `CLAUDE.md` | Tell AI coding tools what Wayforge is and where the guides are. |
 
-The fastest way to start is to copy the example in [section 12](#12-a-complete-example) or one from `journeys/examples/`.
+After updating Wayforge, run `wayforge init` again in the folder: it refreshes `.wayforge/` and never overwrites your journeys, `AGENTS.md` or `CLAUDE.md`.
+
+Start each file with `"$schema": "./.wayforge/schema/journey.schema.json"` (adjust the path for files in subfolders). Editors such as VS Code then autocomplete fields, show their documentation on hover and underline mistakes. The line only affects editor help, never the build.
+
+The fastest way to start is to edit `story.json`, or copy the example in [section 12](#12-a-complete-example) or one from `.wayforge/examples/`.
+
+Working inside a clone of the Wayforge repository instead? Run commands as `npx wayforge …`, keep journeys in `journeys/local/` (ignored by git), and point `"$schema"` at `"../../schema/journey.schema.json"`.
 
 ## 3. Plan before you type
 
@@ -74,7 +83,7 @@ Two features help while the story is still settling:
 
 | Key | Required | What it is |
 |---|---|---|
-| `$schema` | no | Path to `schema/journey.schema.json`, for editor help. |
+| `$schema` | no | Path to the journey schema (`./.wayforge/schema/journey.schema.json` in a folder made by `wayforge init`), for editor help. |
 | `version` | yes | Always `1`. |
 | `meta` | yes | Title, header text, accessible description, language, favicon. |
 | `theme` | no | `"default"` (built in) or a path to a theme file. |
@@ -494,11 +503,11 @@ On touch screens, swipe left or right to step. The page follows the viewer's lig
 
 ## 12. A complete example
 
-A small journey that exercises most features: two lenses, a layer, a panel, every node kind, a pill, a dashed edge, a hidden pass-through edge, labels, packets with phase and dim, a row effect, groups, and a parked element. Save it as `journeys/local/coffee.json` and run `npx wayforge dev journeys/local/coffee.json`.
+A small journey that exercises most features: two lenses, a layer, a panel, every node kind, a pill, a dashed edge, a hidden pass-through edge, labels, packets with phase and dim, a row effect, groups, and a parked element. Save it as `coffee.json` in your journey folder and run `wayforge dev coffee.json`.
 
 ```json
 {
-  "$schema": "../../schema/journey.schema.json",
+  "$schema": "./.wayforge/schema/journey.schema.json",
   "version": 1,
   "meta": {
     "title": "Ordering a coffee",

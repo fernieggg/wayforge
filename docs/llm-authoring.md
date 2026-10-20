@@ -1,13 +1,13 @@
 # Writing a Wayforge journey: brief for an LLM
 
-You are turning a plain-language description of a process, journey or system into a Wayforge journey file: one JSON document that Wayforge builds into an animated, single-page presentation. This brief is self-contained. For full details, the authoritative sources are `schema/journey.schema.json` (every field, with descriptions) and [authoring.md](authoring.md) (the human guide).
+You are turning a plain-language description of a process, journey or system into a Wayforge journey file: one JSON document that Wayforge builds into an animated, single-page presentation. This brief is self-contained. For full details, the authoritative sources are the journey schema (every field, with descriptions; `.wayforge/schema/journey.schema.json` in a folder made by `wayforge init`) and [authoring.md](authoring.md) (the human guide).
 
 ## Your output
 
-1. **One JSON file** that validates against `schema/journey.schema.json`, with no errors and ideally no warnings. Save it in `journeys/local/<name>.json` (ignored by git) with `"$schema": "../../schema/journey.schema.json"` as its first field.
+1. **One JSON file** that validates against the journey schema, with no errors and ideally no warnings. Save it as `<name>.json` in the journey folder (the folder with `AGENTS.md` and `.wayforge/`) with `"$schema": "./.wayforge/schema/journey.schema.json"` as its first field. Inside a clone of the Wayforge repository, save it in `journeys/local/` with `"$schema": "../../schema/journey.schema.json"` instead.
 2. **A short list of open questions and assumptions**, outside the JSON: anything you were not told and therefore left out, simplified or marked as a placeholder.
 
-If you can run commands, validate with `npx wayforge validate <file>` and fix everything it reports before you finish. Every message names the exact path, for example `scenes.team[2].routes[0].edges[1]: unknown edge "qa"`.
+If you can run commands, validate with `wayforge validate <file>` (`npx wayforge validate <file>` inside a clone) and fix everything it reports before you finish. Every message names the exact path, for example `scenes.team[2].routes[0].edges[1]: unknown edge "qa"`.
 
 ## Hard rules
 
@@ -126,7 +126,7 @@ A minimal valid journey to start from. Replace the content, keep the structure.
 
 ```json
 {
-  "$schema": "../../schema/journey.schema.json",
+  "$schema": "./.wayforge/schema/journey.schema.json",
   "version": 1,
   "meta": { "title": "Story title", "description": "One or two sentences describing the whole map for screen readers." },
   "lenses": [{ "id": "main", "label": "Overview", "default": true }],
@@ -191,7 +191,7 @@ The complete list is in [authoring.md, section 10](authoring.md#10-validation-me
 ## Final checklist
 
 - [ ] The JSON parses and has `"version": 1`.
-- [ ] `npx wayforge validate` reports no errors (and ideally no warnings).
+- [ ] `wayforge validate` reports no errors (and ideally no warnings).
 - [ ] Every stage in `stageOrder` is used by at least one scene; keys are shared across lenses for the same stage.
 - [ ] Every node's text fits its size; no edge leaves the bottom of a circle or diamond that has a subtitle.
 - [ ] Edges start and end on connection points; routes that pass through a node use a hidden edge.

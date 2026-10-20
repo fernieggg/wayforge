@@ -20,58 +20,61 @@ journey.json  ──►  wayforge build  ──►  journey.html  (one self-cont
 
 ## Quick start
 
-You need [Node.js](https://nodejs.org) 22.12 or later (`node --version` to check) and git.
+You need [Node.js](https://nodejs.org) 22.12 or later (`node --version` to check).
 
-**1. Install.**
-
-```bash
-git clone https://github.com/fernieggg/wayforge.git
-cd wayforge
-npm install
-```
-
-**2. See an example.**
+**1. Install, once.**
 
 ```bash
-npx wayforge dev journeys/examples/support-ticket.json
+npm install -g github:fernieggg/wayforge
 ```
 
-Open http://localhost:5173 and step through it with the arrow keys; press 1 or 2 to switch views. The first run takes a few extra seconds while Wayforge compiles its browser code. Stop the preview with Ctrl+C.
+This puts the `wayforge` command on your computer. From then on it works in any folder; you never need to look at this repository again.
 
-**3. Start your own.** Keep your journeys in `journeys/local/`; that folder is ignored by git, so your work never mixes with the examples. Copy the example from [section 12 of the authoring guide](docs/authoring.md#12-a-complete-example) into `journeys/local/coffee.json` and preview it:
+**2. Start a folder for your journeys.**
 
 ```bash
-npx wayforge dev journeys/local/coffee.json
+wayforge init my-talk
+cd my-talk
 ```
 
-Edit the file and save: the page rebuilds and reloads on every save, and shows the exact location of any mistake.
+This creates `my-talk/` with:
+
+- `story.json`, a small starter journey;
+- `.wayforge/`, with the authoring guide, the LLM brief, the schema and full example journeys, matching your installed version;
+- `AGENTS.md` (and a `CLAUDE.md` that points to it), so AI coding tools know what Wayforge is and where the guides are as soon as you open the folder.
+
+**3. Preview.**
+
+```bash
+wayforge dev story.json
+```
+
+Open http://localhost:5173 and step through it with the arrow keys. Edit `story.json` and save: the page rebuilds and reloads on every save, and shows the exact location of any mistake. The first run takes a few extra seconds while Wayforge compiles its browser code. Stop the preview with Ctrl+C.
+
+To see a bigger example, run `wayforge dev .wayforge/examples/support-ticket.json` and press 1 or 2 to switch views.
 
 **4. Build and share.**
 
 ```bash
-npx wayforge build journeys/local/coffee.json
+wayforge build story.json
 ```
 
-This writes `dist/coffee.html` (ignored by git; use `-o` to choose another path). It is the whole presentation in one file. Email it, put it on any web host, or open it from disk.
+This writes `dist/story.html` (use `-o` to choose another path). It is the whole presentation in one file. Email it, put it on any web host, or open it from disk.
 
-**5. Optional: use it from any folder.** Run `npm link` once in the `wayforge` folder. After that, the `wayforge` command works anywhere, so your journeys can live in their own folder or repository:
-
-```bash
-wayforge dev ~/talks/onboarding.json
-```
-
-For editor help in files outside the clone, point `"$schema"` at the clone's `schema/journey.schema.json` (a relative or absolute path); it does not affect the build.
+**5. Write with an AI tool.** Open the folder in Claude Code, Codex, Cursor or Copilot and describe your process. `AGENTS.md` sends the tool to the brief in `.wayforge/docs/`, so you don't need to point it at anything. Tools without file access can get the brief with `wayforge docs llm`.
 
 **6. Optional: screenshots of every step.**
 
 ```bash
-npx playwright install chromium     # once
-npx wayforge snapshot journeys/local/coffee.json
+npm install @playwright/test && npx playwright install chromium     # once, in this folder
+wayforge snapshot story.json
 ```
 
-PNGs land in `snapshots/coffee/`.
+PNGs land in `snapshots/story/`.
 
-Next, read **[docs/authoring.md](docs/authoring.md)**, the complete guide: every field, colors, layout with concrete numbers, scenes, sub-flows, and what every validation message means. To have an LLM write a journey, give it **[docs/llm-authoring.md](docs/llm-authoring.md)**.
+**Keeping up to date.** Run the install command again to update Wayforge, then `wayforge init` in each journey folder to refresh `.wayforge/`. Your journeys, `AGENTS.md` and `CLAUDE.md` are never overwritten.
+
+Next, read **`.wayforge/docs/authoring.md`** ([online](docs/authoring.md)), the complete guide: every field, colors, layout with concrete numbers, scenes, sub-flows, and what every validation message means. The brief for an LLM is [docs/llm-authoring.md](docs/llm-authoring.md).
 
 ## How it works
 
@@ -91,11 +94,11 @@ The look comes from a theme ([`themes/default.json`](themes/default.json)) that 
 
 ## Writing a journey
 
-A journey is one JSON file, validated against [`schema/journey.schema.json`](schema/journey.schema.json). Start the file with `"$schema"` pointing at it, and editors such as VS Code autocomplete fields and explain each one on hover.
+A journey is one JSON file, validated against [`schema/journey.schema.json`](schema/journey.schema.json) (copied to `.wayforge/schema/` by `wayforge init`). Start the file with `"$schema"` pointing at it, and editors such as VS Code autocomplete fields and explain each one on hover.
 
 ```json
 {
-  "$schema": "../../schema/journey.schema.json",
+  "$schema": "./.wayforge/schema/journey.schema.json",
   "version": 1,
   "meta": { "title": "A support ticket, start to finish", "brand": "Support flow" },
   "lenses": [
@@ -178,13 +181,15 @@ On touch screens, swipe left or right. The page follows the viewer's light or da
 ## Commands
 
 ```bash
+wayforge init     [folder] [--name story.json]              # set up a folder: starter journey, guides, schema, AGENTS.md
+wayforge docs     [authoring|llm|schema]                    # where the installed guides are, or print one
 wayforge validate <journey.json> [--strict]                 # check a journey and its sub-flows
 wayforge build    <journey.json> [-o out.html] [--strict]   # build one self-contained HTML file (default dist/<name>.html)
 wayforge dev      <journey.json> [--port 5173]              # serve, rebuild and reload on save
 wayforge snapshot <journey.json> [--lens id] [--theme light|dark] [-o dir]   # a PNG of every step of the tour
 ```
 
-`--strict` treats warnings as errors. `snapshot` needs a browser for Playwright: run `npx playwright install chromium` once. From a source checkout, run any command as `npx wayforge …`.
+`--strict` treats warnings as errors. `snapshot` needs Playwright and a browser: run `npm install @playwright/test && npx playwright install chromium` once in your journey folder. `wayforge --version` prints the installed version.
 
 ## What you get
 
@@ -203,17 +208,29 @@ schema/        journey.schema.json, theme.schema.json
 themes/        default.json (design tokens)
 journeys/      examples/ (support-ticket, support-queue, knowledge-base); local/ for your own (ignored by git)
 docs/          authoring.md (complete guide), llm-authoring.md (brief for an LLM)
+templates/     workspace/: the starter journey, AGENTS.md and CLAUDE.md that `wayforge init` writes
 src/
   model/       loading, defaults, sub-flow tree, lens rules, generated schema types
   geometry/    pure layout math: shapes, text and pill placement, paths, zoom placement
   validate/    JSON Schema, reference integrity, lints
   render/      build-time HTML: CSS from the theme, SVG, page chrome, runtime data
   runtime/     browser code (camera, packets, lenses, scenes, effects, zoom, input), bundled and inlined
-  cli/         validate, build, dev, snapshot
+  cli/         init, docs, validate, build, dev, snapshot
 tests/         unit, validate (fixtures and docs examples), constraints (built output), e2e and visual (Playwright)
 ```
 
 ## Development
+
+To work on Wayforge itself, clone the repository and link the command to your checkout, so `wayforge` runs your local code:
+
+```bash
+git clone https://github.com/fernieggg/wayforge.git
+cd wayforge
+npm install
+npm link
+```
+
+Inside the checkout you can also run any command as `npx wayforge …`, and keep test journeys in `journeys/local/`, which git ignores. Then:
 
 ```bash
 npm test                  # unit, validation, docs-example and output-constraint tests
@@ -232,4 +249,8 @@ The visual regression suite in `tests/regression/` builds a journey and compares
 
 ## Status
 
-Wayforge is in active development and not yet published to npm. A license has not been chosen yet.
+Wayforge is in active development and not yet published to npm.
+
+## License
+
+[MIT](LICENSE) © 2026 Fernando Garcia. Presentations you build carry a one-line notice for the Wayforge code inside them; your journeys and their content are yours.

@@ -150,11 +150,12 @@ The repo will become public. Build with that in mind from the start:
 - **Nothing private in the engine.** No company names, internal system names or customer data in `src/`, `schema/`, `themes/`, tests or docs.
 - **Proprietary journeys never go in this repo.** Keep them outside it or in the ignored `journeys/local/`. Public example journeys go in `journeys/examples/` and must be generic.
 - **No secrets, ever.** There should be none to begin with. Keep the `.gitignore` and the `.env.example` placeholder, and never commit credentials.
-- **Package identity.** Scoped npm package `@<owner>/wayforge` with a `wayforge` binary. Do not publish anything without the user's explicit go-ahead.
+- **Package identity.** Unscoped npm package `wayforge` with a `wayforge` binary (still free on npm on 2026-10-20; nothing reserves it until the first publish). `"private": true` stays in `package.json` until the user gives an explicit go-ahead to publish. Until then users install from GitHub (`npm install -g github:fernieggg/wayforge`); `package.json` `files` lists what ships, and tsx and vite are runtime dependencies of the CLI.
 - **Name hygiene.** Use "Wayforge" consistently. Do not reuse names of other projects in code or docs. On 2026-10-04 npm and PyPI had no `wayforge` package and the closest GitHub match was a small unrelated repo. A domain and trademark check is still pending; flag it before any public release.
 - **Discoverability.** The name is a coined word, so the repo description and topics do the search work. One-liner: "Diagram-as-code for animated, multi-lens journey and architecture presentations." Topics: `diagram-as-code`, `visualization`, `svg`, `presentation`, `journey-map`, `architecture-diagram`.
 - **README is for users.** It describes the product. Internal development notes belong here, not in the README.
-- **Before launch:** license file (ask which), `CONTRIBUTING.md`, CI running validation, regression and screenshot tests, and a README quick start that works on a clean machine.
+- **License.** MIT, copyright Fernando Garcia (`LICENSE`). Built pages carry a one-line notice comment for the inlined runtime (`src/render/html.ts`); keep it.
+- **Before launch:** `CONTRIBUTING.md`, CI running validation, regression and screenshot tests, and a README quick start that works on a clean machine.
 
 ## Tooling and commands
 
@@ -163,6 +164,8 @@ Unless the user says otherwise: Node 22.12+ (Vite and Vitest need it; the CLI ch
 Commands to keep working (documented in `README.md`):
 
 ```bash
+wayforge init [folder]
+wayforge docs [authoring|llm|schema]
 wayforge validate <file>
 wayforge build <file> -o <out.html>
 wayforge dev <file>
@@ -185,6 +188,8 @@ A change is done only when all of these hold:
 5. `npm test` passes.
 
 ## Authoring docs
+
+Users get the docs through `wayforge init`, which copies `docs/`, `schema/` and `journeys/examples/` into a journey folder's `.wayforge/` and writes the files in `templates/workspace/` (a starter journey and an `AGENTS.md` that sends AI tools to the LLM brief). The docs therefore have to read correctly both in the repository and as copies in `.wayforge/docs/`: link only between files in `docs/`, and describe paths for a journey folder first, with the clone as the alternative.
 
 `docs/authoring.md` (for people) and `docs/llm-authoring.md` (for an LLM) must stay complete and correct. Any change to the schema, the theme, defaults, layout math, validation rules or interaction updates them in the same change. Every ```json block in `README.md` and `docs/` is parsed by `tests/validate/docs.test.ts`, and each complete journey among them must validate with no errors or warnings. Fence fragments as ```jsonc.
 
